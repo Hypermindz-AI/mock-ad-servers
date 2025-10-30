@@ -12,10 +12,10 @@ describe('Meta Marketing API v23.0', () => {
   // OAuth Flow Tests
   // ============================================
   describe('OAuth Flow', () => {
-    describe('GET /v23.0/dialog/oauth', () => {
+    describe('GET /meta/v23.0/dialog/oauth', () => {
       it('should successfully authorize with valid parameters', async () => {
         const response = await request(app)
-          .get('/v23.0/dialog/oauth')
+          .get('/meta/v23.0/dialog/oauth')
           .query({
             client_id: CLIENT_ID,
             redirect_uri: REDIRECT_URI,
@@ -34,7 +34,7 @@ describe('Meta Marketing API v23.0', () => {
 
       it('should fail when missing client_id', async () => {
         const response = await request(app)
-          .get('/v23.0/dialog/oauth')
+          .get('/meta/v23.0/dialog/oauth')
           .query({
             redirect_uri: REDIRECT_URI,
             response_type: 'code',
@@ -49,7 +49,7 @@ describe('Meta Marketing API v23.0', () => {
 
       it('should fail when missing redirect_uri', async () => {
         const response = await request(app)
-          .get('/v23.0/dialog/oauth')
+          .get('/meta/v23.0/dialog/oauth')
           .query({
             client_id: CLIENT_ID,
             response_type: 'code',
@@ -64,7 +64,7 @@ describe('Meta Marketing API v23.0', () => {
 
       it('should fail when missing response_type', async () => {
         const response = await request(app)
-          .get('/v23.0/dialog/oauth')
+          .get('/meta/v23.0/dialog/oauth')
           .query({
             client_id: CLIENT_ID,
             redirect_uri: REDIRECT_URI,
@@ -79,7 +79,7 @@ describe('Meta Marketing API v23.0', () => {
 
       it('should fail with invalid response_type', async () => {
         const response = await request(app)
-          .get('/v23.0/dialog/oauth')
+          .get('/meta/v23.0/dialog/oauth')
           .query({
             client_id: CLIENT_ID,
             redirect_uri: REDIRECT_URI,
@@ -96,7 +96,7 @@ describe('Meta Marketing API v23.0', () => {
 
       it('should fail with invalid client_id', async () => {
         const response = await request(app)
-          .get('/v23.0/dialog/oauth')
+          .get('/meta/v23.0/dialog/oauth')
           .query({
             client_id: 'invalid_client_id',
             redirect_uri: REDIRECT_URI,
@@ -114,7 +114,7 @@ describe('Meta Marketing API v23.0', () => {
     describe('GET /v23.0/oauth/access_token', () => {
       it('should exchange authorization code for access token', async () => {
         const response = await request(app)
-          .get('/v23.0/oauth/access_token')
+          .get('/meta/v23.0/oauth/access_token')
           .query({
             client_id: CLIENT_ID,
             client_secret: CLIENT_SECRET,
@@ -131,7 +131,7 @@ describe('Meta Marketing API v23.0', () => {
 
       it('should generate app access token with client_credentials grant', async () => {
         const response = await request(app)
-          .get('/v23.0/oauth/access_token')
+          .get('/meta/v23.0/oauth/access_token')
           .query({
             client_id: CLIENT_ID,
             client_secret: CLIENT_SECRET,
@@ -146,7 +146,7 @@ describe('Meta Marketing API v23.0', () => {
 
       it('should fail when missing client_id', async () => {
         const response = await request(app)
-          .get('/v23.0/oauth/access_token')
+          .get('/meta/v23.0/oauth/access_token')
           .query({
             client_secret: CLIENT_SECRET,
             redirect_uri: REDIRECT_URI,
@@ -163,7 +163,7 @@ describe('Meta Marketing API v23.0', () => {
 
       it('should fail when missing client_secret', async () => {
         const response = await request(app)
-          .get('/v23.0/oauth/access_token')
+          .get('/meta/v23.0/oauth/access_token')
           .query({
             client_id: CLIENT_ID,
             redirect_uri: REDIRECT_URI,
@@ -180,7 +180,7 @@ describe('Meta Marketing API v23.0', () => {
 
       it('should fail with invalid client_id', async () => {
         const response = await request(app)
-          .get('/v23.0/oauth/access_token')
+          .get('/meta/v23.0/oauth/access_token')
           .query({
             client_id: 'invalid_client_id',
             client_secret: CLIENT_SECRET,
@@ -197,7 +197,7 @@ describe('Meta Marketing API v23.0', () => {
 
       it('should fail with invalid client_secret', async () => {
         const response = await request(app)
-          .get('/v23.0/oauth/access_token')
+          .get('/meta/v23.0/oauth/access_token')
           .query({
             client_id: CLIENT_ID,
             client_secret: 'invalid_secret',
@@ -214,7 +214,7 @@ describe('Meta Marketing API v23.0', () => {
 
       it('should fail when missing code for authorization code flow', async () => {
         const response = await request(app)
-          .get('/v23.0/oauth/access_token')
+          .get('/meta/v23.0/oauth/access_token')
           .query({
             client_id: CLIENT_ID,
             client_secret: CLIENT_SECRET,
@@ -231,7 +231,7 @@ describe('Meta Marketing API v23.0', () => {
 
       it('should fail with invalid authorization code format', async () => {
         const response = await request(app)
-          .get('/v23.0/oauth/access_token')
+          .get('/meta/v23.0/oauth/access_token')
           .query({
             client_id: CLIENT_ID,
             client_secret: CLIENT_SECRET,
@@ -557,7 +557,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const createResponse = await request(app)
-          .post('/v23.0/act_123456789/campaigns')
+          .post('/meta/v23.0/act_123456789/campaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(campaignData);
 
@@ -604,7 +604,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const createResponse = await request(app)
-          .post('/v23.0/act_123456789/campaigns')
+          .post('/meta/v23.0/act_123456789/campaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(campaignData);
 
@@ -643,7 +643,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const createResponse = await request(app)
-          .post('/v23.0/act_123456789/campaigns')
+          .post('/meta/v23.0/act_123456789/campaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(campaignData);
 
@@ -674,7 +674,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const createResponse = await request(app)
-          .post('/v23.0/act_123456789/campaigns')
+          .post('/meta/v23.0/act_123456789/campaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(campaignData);
 
@@ -705,7 +705,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const createResponse = await request(app)
-          .post('/v23.0/act_123456789/campaigns')
+          .post('/meta/v23.0/act_123456789/campaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(campaignData);
 
@@ -759,7 +759,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const createResponse = await request(app)
-          .post('/v23.0/act_123456789/campaigns')
+          .post('/meta/v23.0/act_123456789/campaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(campaignData);
 
@@ -793,7 +793,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const createResponse = await request(app)
-          .post('/v23.0/act_123456789/campaigns')
+          .post('/meta/v23.0/act_123456789/campaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(campaignData);
 
@@ -827,7 +827,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const createResponse = await request(app)
-          .post('/v23.0/act_123456789/campaigns')
+          .post('/meta/v23.0/act_123456789/campaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(campaignData);
 
@@ -861,7 +861,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const createResponse = await request(app)
-          .post('/v23.0/act_123456789/campaigns')
+          .post('/meta/v23.0/act_123456789/campaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(campaignData);
 

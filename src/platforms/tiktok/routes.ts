@@ -3,7 +3,7 @@ import { createCampaign, updateCampaign, getCampaign } from './controllers';
 
 /**
  * TikTok Marketing API Routes
- * Base URL: /open_api/v1.3
+ * Base URL: /tiktok/v1.3
  * API Version: v1.3
  *
  * Authentication: Bearer token in Authorization header
@@ -20,7 +20,7 @@ const router = Router();
 
 /**
  * Create Campaign
- * POST /open_api/v1.3/campaign/create/
+ * POST /tiktok/v1.3/campaign/create/
  *
  * Creates a new advertising campaign for a TikTok advertiser account.
  *
@@ -60,7 +60,7 @@ router.post('/campaign/create/', createCampaign);
 
 /**
  * Update Campaign
- * POST /open_api/v1.3/campaign/update/
+ * POST /tiktok/v1.3/campaign/update/
  *
  * Updates an existing campaign's properties.
  *
@@ -94,7 +94,7 @@ router.post('/campaign/update/', updateCampaign);
 
 /**
  * Get Campaign
- * GET /open_api/v1.3/campaign/get/
+ * GET /tiktok/v1.3/campaign/get/
  *
  * Retrieves campaign details for an advertiser account.
  *

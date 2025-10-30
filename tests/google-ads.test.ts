@@ -14,10 +14,10 @@ const TEST_CAMPAIGN_NAME = 'Test Campaign';
 const TEST_BUDGET_RESOURCE = `customers/${TEST_CUSTOMER_ID}/campaignBudgets/9876543210`;
 
 describe('Google Ads API v21 - OAuth Flow Tests', () => {
-  describe('GET /oauth/authorize', () => {
+  describe('GET /google/oauth/authorize', () => {
     it('should successfully authorize with valid parameters', async () => {
       const response = await request(app)
-        .get('/oauth/authorize')
+        .get('/google/oauth/authorize')
         .query({
           client_id: VALID_CLIENT_ID,
           redirect_uri: VALID_REDIRECT_URI,
@@ -34,7 +34,7 @@ describe('Google Ads API v21 - OAuth Flow Tests', () => {
     it('should return authorization code with state parameter', async () => {
       const testState = 'test_state_12345';
       const response = await request(app)
-        .get('/oauth/authorize')
+        .get('/google/oauth/authorize')
         .query({
           client_id: VALID_CLIENT_ID,
           redirect_uri: VALID_REDIRECT_URI,
@@ -49,7 +49,7 @@ describe('Google Ads API v21 - OAuth Flow Tests', () => {
 
     it('should fail with missing client_id', async () => {
       const response = await request(app)
-        .get('/oauth/authorize')
+        .get('/google/oauth/authorize')
         .query({
           redirect_uri: VALID_REDIRECT_URI,
           response_type: 'code',
@@ -62,7 +62,7 @@ describe('Google Ads API v21 - OAuth Flow Tests', () => {
 
     it('should fail with missing redirect_uri', async () => {
       const response = await request(app)
-        .get('/oauth/authorize')
+        .get('/google/oauth/authorize')
         .query({
           client_id: VALID_CLIENT_ID,
           response_type: 'code',
@@ -74,7 +74,7 @@ describe('Google Ads API v21 - OAuth Flow Tests', () => {
 
     it('should fail with invalid response_type', async () => {
       const response = await request(app)
-        .get('/oauth/authorize')
+        .get('/google/oauth/authorize')
         .query({
           client_id: VALID_CLIENT_ID,
           redirect_uri: VALID_REDIRECT_URI,
@@ -87,7 +87,7 @@ describe('Google Ads API v21 - OAuth Flow Tests', () => {
 
     it('should fail with invalid client_id', async () => {
       const response = await request(app)
-        .get('/oauth/authorize')
+        .get('/google/oauth/authorize')
         .query({
           client_id: 'invalid_client_id',
           redirect_uri: VALID_REDIRECT_URI,
@@ -101,7 +101,7 @@ describe('Google Ads API v21 - OAuth Flow Tests', () => {
 
     it('should fail with invalid scope', async () => {
       const response = await request(app)
-        .get('/oauth/authorize')
+        .get('/google/oauth/authorize')
         .query({
           client_id: VALID_CLIENT_ID,
           redirect_uri: VALID_REDIRECT_URI,
@@ -121,7 +121,7 @@ describe('Google Ads API v21 - OAuth Flow Tests', () => {
     beforeEach(async () => {
       // Get a valid authorization code for tests
       const authResponse = await request(app)
-        .get('/oauth/authorize')
+        .get('/google/oauth/authorize')
         .query({
           client_id: VALID_CLIENT_ID,
           redirect_uri: VALID_REDIRECT_URI,
@@ -135,7 +135,7 @@ describe('Google Ads API v21 - OAuth Flow Tests', () => {
     describe('authorization_code grant type', () => {
       it('should successfully exchange authorization code for tokens', async () => {
         const response = await request(app)
-          .post('/oauth/token')
+          .post('/google/oauth/token')
           .send({
             client_id: VALID_CLIENT_ID,
             client_secret: VALID_CLIENT_SECRET,
@@ -155,7 +155,7 @@ describe('Google Ads API v21 - OAuth Flow Tests', () => {
 
       it('should fail with missing client credentials', async () => {
         const response = await request(app)
-          .post('/oauth/token')
+          .post('/google/oauth/token')
           .send({
             code: authorizationCode,
             grant_type: 'authorization_code',
@@ -169,7 +169,7 @@ describe('Google Ads API v21 - OAuth Flow Tests', () => {
 
       it('should fail with invalid client credentials', async () => {
         const response = await request(app)
-          .post('/oauth/token')
+          .post('/google/oauth/token')
           .send({
             client_id: 'invalid_id',
             client_secret: 'invalid_secret',
@@ -185,7 +185,7 @@ describe('Google Ads API v21 - OAuth Flow Tests', () => {
 
       it('should fail with missing authorization code', async () => {
         const response = await request(app)
-          .post('/oauth/token')
+          .post('/google/oauth/token')
           .send({
             client_id: VALID_CLIENT_ID,
             client_secret: VALID_CLIENT_SECRET,
@@ -200,7 +200,7 @@ describe('Google Ads API v21 - OAuth Flow Tests', () => {
 
       it('should fail with invalid authorization code', async () => {
         const response = await request(app)
-          .post('/oauth/token')
+          .post('/google/oauth/token')
           .send({
             client_id: VALID_CLIENT_ID,
             client_secret: VALID_CLIENT_SECRET,
@@ -216,7 +216,7 @@ describe('Google Ads API v21 - OAuth Flow Tests', () => {
 
       it('should fail with mismatched redirect_uri', async () => {
         const response = await request(app)
-          .post('/oauth/token')
+          .post('/google/oauth/token')
           .send({
             client_id: VALID_CLIENT_ID,
             client_secret: VALID_CLIENT_SECRET,
@@ -233,7 +233,7 @@ describe('Google Ads API v21 - OAuth Flow Tests', () => {
       it('should invalidate authorization code after use', async () => {
         // Use the code once
         await request(app)
-          .post('/oauth/token')
+          .post('/google/oauth/token')
           .send({
             client_id: VALID_CLIENT_ID,
             client_secret: VALID_CLIENT_SECRET,
@@ -244,7 +244,7 @@ describe('Google Ads API v21 - OAuth Flow Tests', () => {
 
         // Try to use it again
         const response = await request(app)
-          .post('/oauth/token')
+          .post('/google/oauth/token')
           .send({
             client_id: VALID_CLIENT_ID,
             client_secret: VALID_CLIENT_SECRET,
@@ -264,7 +264,7 @@ describe('Google Ads API v21 - OAuth Flow Tests', () => {
       beforeEach(async () => {
         // Get a refresh token
         const tokenResponse = await request(app)
-          .post('/oauth/token')
+          .post('/google/oauth/token')
           .send({
             client_id: VALID_CLIENT_ID,
             client_secret: VALID_CLIENT_SECRET,
@@ -278,7 +278,7 @@ describe('Google Ads API v21 - OAuth Flow Tests', () => {
 
       it('should successfully refresh access token', async () => {
         const response = await request(app)
-          .post('/oauth/token')
+          .post('/google/oauth/token')
           .send({
             client_id: VALID_CLIENT_ID,
             client_secret: VALID_CLIENT_SECRET,
@@ -296,7 +296,7 @@ describe('Google Ads API v21 - OAuth Flow Tests', () => {
 
       it('should fail with missing refresh_token', async () => {
         const response = await request(app)
-          .post('/oauth/token')
+          .post('/google/oauth/token')
           .send({
             client_id: VALID_CLIENT_ID,
             client_secret: VALID_CLIENT_SECRET,
@@ -310,7 +310,7 @@ describe('Google Ads API v21 - OAuth Flow Tests', () => {
 
       it('should fail with invalid refresh_token', async () => {
         const response = await request(app)
-          .post('/oauth/token')
+          .post('/google/oauth/token')
           .send({
             client_id: VALID_CLIENT_ID,
             client_secret: VALID_CLIENT_SECRET,
@@ -325,7 +325,7 @@ describe('Google Ads API v21 - OAuth Flow Tests', () => {
 
       it('should fail with invalid client credentials', async () => {
         const response = await request(app)
-          .post('/oauth/token')
+          .post('/google/oauth/token')
           .send({
             client_id: 'invalid_id',
             client_secret: 'invalid_secret',
@@ -341,7 +341,7 @@ describe('Google Ads API v21 - OAuth Flow Tests', () => {
     describe('unsupported grant types', () => {
       it('should fail with unsupported grant type', async () => {
         const response = await request(app)
-          .post('/oauth/token')
+          .post('/google/oauth/token')
           .send({
             client_id: VALID_CLIENT_ID,
             client_secret: VALID_CLIENT_SECRET,

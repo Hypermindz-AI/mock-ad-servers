@@ -15,7 +15,7 @@ const router = Router();
 
 /**
  * DV360 API v4 Routes
- * Base URL: /v4
+ * Base URL: /dv360/v4
  *
  * Authentication:
  * - Uses Google OAuth 2.0 (shared with Google Ads)
@@ -28,7 +28,7 @@ const router = Router();
 
 /**
  * Create a new campaign
- * POST /v4/advertisers/:advertiserId/campaigns
+ * POST /dv360/v4/advertisers/:advertiserId/campaigns
  *
  * Request body:
  * {
@@ -63,7 +63,7 @@ router.post('/advertisers/:advertiserId/campaigns', validateDV360Auth, createCam
 
 /**
  * Update an existing campaign
- * PATCH /v4/advertisers/:advertiserId/campaigns/:campaignId
+ * PATCH /dv360/v4/advertisers/:advertiserId/campaigns/:campaignId
  *
  * Request body:
  * {
@@ -84,7 +84,7 @@ router.patch('/advertisers/:advertiserId/campaigns/:campaignId', validateDV360Au
 
 /**
  * Get a campaign by ID
- * GET /v4/advertisers/:advertiserId/campaigns/:campaignId
+ * GET /dv360/v4/advertisers/:advertiserId/campaigns/:campaignId
  *
  * Response 200:
  * {

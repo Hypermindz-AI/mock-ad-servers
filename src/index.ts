@@ -63,18 +63,18 @@ app.get('/', (_req, res) => {
     version: '1.0.0',
     platforms: [
       { name: 'Google Ads', version: 'v21', baseUrl: '/googleads/v21' },
-      { name: 'Meta Marketing', version: 'v23.0', baseUrl: '/v23.0' },
-      { name: 'LinkedIn Marketing', version: '202510', baseUrl: '/rest' },
-      { name: 'TikTok Marketing', version: 'v1.3', baseUrl: '/open_api/v1.3' },
-      { name: 'The Trade Desk', version: 'v3', baseUrl: '/v3' },
-      { name: 'DV360', version: 'v4', baseUrl: '/v4' },
+      { name: 'Meta Marketing', version: 'v23.0', baseUrl: '/meta/v23.0' },
+      { name: 'LinkedIn Marketing', version: '202510', baseUrl: '/linkedin/rest' },
+      { name: 'TikTok Marketing', version: 'v1.3', baseUrl: '/tiktok/v1.3' },
+      { name: 'The Trade Desk', version: 'v3', baseUrl: '/ttd/v3' },
+      { name: 'DV360', version: 'v4', baseUrl: '/dv360/v4' },
     ],
     oauth: [
-      { platform: 'Google (Ads & DV360)', baseUrl: '/oauth' },
-      { platform: 'Meta', baseUrl: '/v23.0/dialog/oauth' },
-      { platform: 'LinkedIn', baseUrl: '/oauth/v2' },
-      { platform: 'TikTok', baseUrl: '/oauth' },
-      { platform: 'The Trade Desk', baseUrl: '/v3/authentication (Token-based)' },
+      { platform: 'Google (Ads & DV360)', baseUrl: '/google/oauth' },
+      { platform: 'Meta', baseUrl: '/meta/v23.0/dialog/oauth' },
+      { platform: 'LinkedIn', baseUrl: '/linkedin/oauth/v2' },
+      { platform: 'TikTok', baseUrl: '/tiktok/oauth' },
+      { platform: 'The Trade Desk', baseUrl: '/ttd/v3/authentication (Token-based)' },
     ],
     documentation: '/IMPLEMENTATION_PLAN.md',
   });
@@ -84,19 +84,17 @@ app.get('/', (_req, res) => {
 // OAuth/Authentication Routes
 // ============================================
 
-// TikTok OAuth (must be before Google OAuth to avoid route conflicts)
-// TikTok uses /oauth/authorize and /v2/oauth/token/ with client_key parameter
-app.use(tikTokOAuthRouter);
-
 // Google OAuth (used by Google Ads & DV360)
-// Google uses /oauth/authorize and /oauth/token with client_id parameter
-app.use('/oauth', googleOAuthRouter);
+app.use('/google/oauth', googleOAuthRouter);
 
 // Meta OAuth
-app.use(metaOAuthRouter);
+app.use('/meta', metaOAuthRouter);
 
 // LinkedIn OAuth
-app.use(linkedInOAuthRouter);
+app.use('/linkedin', linkedInOAuthRouter);
+
+// TikTok OAuth
+app.use('/tiktok', tikTokOAuthRouter);
 
 // ============================================
 // Platform API Routes
@@ -106,19 +104,19 @@ app.use(linkedInOAuthRouter);
 app.use('/googleads/v21', googleAdsRouter);
 
 // Meta Marketing API v23.0
-app.use(metaRouter);
+app.use('/meta', metaRouter);
 
 // LinkedIn Marketing API 202510
-app.use('/rest', linkedInRouter);
+app.use('/linkedin/rest', linkedInRouter);
 
-// TikTok Marketing API
-app.use('/open_api/v1.3', tikTokRouter);
+// TikTok Marketing API v1.3
+app.use('/tiktok/v1.3', tikTokRouter);
 
 // The Trade Desk API v3
-app.use('/v3', tradeDeskRouter);
+app.use('/ttd/v3', tradeDeskRouter);
 
 // DV360 API v4
-app.use('/v4', dv360Router);
+app.use('/dv360/v4', dv360Router);
 
 // ============================================
 // Error Handling

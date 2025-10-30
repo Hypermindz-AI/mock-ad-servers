@@ -28,10 +28,10 @@ describe('TikTok Marketing API', () => {
   // ============================================
 
   describe('OAuth Flow', () => {
-    describe('GET /oauth/authorize', () => {
+    describe('GET /tiktok/oauth/authorize', () => {
       it('should successfully authorize with valid parameters', async () => {
         const response = await request(app)
-          .get('/oauth/authorize')
+          .get('/tiktok/oauth/authorize')
           .query({
             client_key: VALID_CLIENT_KEY,
             response_type: 'code',
@@ -59,7 +59,7 @@ describe('TikTok Marketing API', () => {
 
       it('should fail when missing required parameters', async () => {
         const response = await request(app)
-          .get('/oauth/authorize')
+          .get('/tiktok/oauth/authorize')
           .query({
             client_key: VALID_CLIENT_KEY,
             response_type: 'code'
@@ -75,7 +75,7 @@ describe('TikTok Marketing API', () => {
 
       it('should fail with invalid response_type', async () => {
         const response = await request(app)
-          .get('/oauth/authorize')
+          .get('/tiktok/oauth/authorize')
           .query({
             client_key: VALID_CLIENT_KEY,
             response_type: 'token', // Invalid, should be 'code'
@@ -92,7 +92,7 @@ describe('TikTok Marketing API', () => {
 
       it('should fail with invalid client_key', async () => {
         const response = await request(app)
-          .get('/oauth/authorize')
+          .get('/tiktok/oauth/authorize')
           .query({
             client_key: 'invalid_client_key',
             response_type: 'code',
@@ -108,12 +108,12 @@ describe('TikTok Marketing API', () => {
       });
     });
 
-    describe('POST /v2/oauth/token/', () => {
+    describe('POST /tiktok/v2/oauth/token/', () => {
       it('should exchange authorization code for access token', async () => {
         const authCode = 'tiktok_auth_code_1234567890_abc123';
 
         const response = await request(app)
-          .post('/v2/oauth/token/')
+          .post('/tiktok/v2/oauth/token/')
           .send({
             client_key: VALID_CLIENT_KEY,
             client_secret: VALID_CLIENT_SECRET,
@@ -140,7 +140,7 @@ describe('TikTok Marketing API', () => {
         const refreshToken = 'tiktok_refresh_token_1234567890_xyz789';
 
         const response = await request(app)
-          .post('/v2/oauth/token/')
+          .post('/tiktok/v2/oauth/token/')
           .send({
             client_key: VALID_CLIENT_KEY,
             client_secret: VALID_CLIENT_SECRET,
@@ -163,7 +163,7 @@ describe('TikTok Marketing API', () => {
 
       it('should fail when missing required parameters', async () => {
         const response = await request(app)
-          .post('/v2/oauth/token/')
+          .post('/tiktok/v2/oauth/token/')
           .send({
             client_key: VALID_CLIENT_KEY
             // Missing client_secret and grant_type
@@ -178,7 +178,7 @@ describe('TikTok Marketing API', () => {
 
       it('should fail with invalid client credentials', async () => {
         const response = await request(app)
-          .post('/v2/oauth/token/')
+          .post('/tiktok/v2/oauth/token/')
           .send({
             client_key: 'invalid_key',
             client_secret: 'invalid_secret',
@@ -196,7 +196,7 @@ describe('TikTok Marketing API', () => {
 
       it('should fail when missing required parameters for authorization_code grant', async () => {
         const response = await request(app)
-          .post('/v2/oauth/token/')
+          .post('/tiktok/v2/oauth/token/')
           .send({
             client_key: VALID_CLIENT_KEY,
             client_secret: VALID_CLIENT_SECRET,
@@ -213,7 +213,7 @@ describe('TikTok Marketing API', () => {
 
       it('should fail with invalid authorization code', async () => {
         const response = await request(app)
-          .post('/v2/oauth/token/')
+          .post('/tiktok/v2/oauth/token/')
           .send({
             client_key: VALID_CLIENT_KEY,
             client_secret: VALID_CLIENT_SECRET,
@@ -231,7 +231,7 @@ describe('TikTok Marketing API', () => {
 
       it('should fail when missing refresh_token parameter', async () => {
         const response = await request(app)
-          .post('/v2/oauth/token/')
+          .post('/tiktok/v2/oauth/token/')
           .send({
             client_key: VALID_CLIENT_KEY,
             client_secret: VALID_CLIENT_SECRET,
@@ -248,7 +248,7 @@ describe('TikTok Marketing API', () => {
 
       it('should fail with invalid refresh_token format', async () => {
         const response = await request(app)
-          .post('/v2/oauth/token/')
+          .post('/tiktok/v2/oauth/token/')
           .send({
             client_key: VALID_CLIENT_KEY,
             client_secret: VALID_CLIENT_SECRET,
@@ -265,7 +265,7 @@ describe('TikTok Marketing API', () => {
 
       it('should fail with unsupported grant type', async () => {
         const response = await request(app)
-          .post('/v2/oauth/token/')
+          .post('/tiktok/v2/oauth/token/')
           .send({
             client_key: VALID_CLIENT_KEY,
             client_secret: VALID_CLIENT_SECRET,
@@ -289,7 +289,7 @@ describe('TikTok Marketing API', () => {
     describe('POST /open_api/v1.3/campaign/create/', () => {
       it('should create campaign successfully with valid data', async () => {
         const response = await request(app)
-          .post('/open_api/v1.3/campaign/create/')
+          .post('/tiktok/v1.3/campaign/create/')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send({
             advertiser_id: '123456',
@@ -312,7 +312,7 @@ describe('TikTok Marketing API', () => {
 
       it('should fail when missing advertiser_id', async () => {
         const response = await request(app)
-          .post('/open_api/v1.3/campaign/create/')
+          .post('/tiktok/v1.3/campaign/create/')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send({
             campaign_name: 'Test Campaign',
@@ -331,7 +331,7 @@ describe('TikTok Marketing API', () => {
 
       it('should fail when missing campaign_name', async () => {
         const response = await request(app)
-          .post('/open_api/v1.3/campaign/create/')
+          .post('/tiktok/v1.3/campaign/create/')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send({
             advertiser_id: '123456',
@@ -350,7 +350,7 @@ describe('TikTok Marketing API', () => {
 
       it('should fail with invalid objective_type', async () => {
         const response = await request(app)
-          .post('/open_api/v1.3/campaign/create/')
+          .post('/tiktok/v1.3/campaign/create/')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send({
             advertiser_id: '123456',
@@ -370,7 +370,7 @@ describe('TikTok Marketing API', () => {
 
       it('should fail with invalid budget_mode', async () => {
         const response = await request(app)
-          .post('/open_api/v1.3/campaign/create/')
+          .post('/tiktok/v1.3/campaign/create/')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send({
             advertiser_id: '123456',
@@ -390,7 +390,7 @@ describe('TikTok Marketing API', () => {
 
       it('should fail when budget is missing for BUDGET_MODE_DAY', async () => {
         const response = await request(app)
-          .post('/open_api/v1.3/campaign/create/')
+          .post('/tiktok/v1.3/campaign/create/')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send({
             advertiser_id: '123456',
@@ -409,7 +409,7 @@ describe('TikTok Marketing API', () => {
 
       it('should fail with negative budget', async () => {
         const response = await request(app)
-          .post('/open_api/v1.3/campaign/create/')
+          .post('/tiktok/v1.3/campaign/create/')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send({
             advertiser_id: '123456',
@@ -429,7 +429,7 @@ describe('TikTok Marketing API', () => {
 
       it('should fail with zero budget', async () => {
         const response = await request(app)
-          .post('/open_api/v1.3/campaign/create/')
+          .post('/tiktok/v1.3/campaign/create/')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send({
             advertiser_id: '123456',
@@ -449,7 +449,7 @@ describe('TikTok Marketing API', () => {
 
       it('should create campaign with BUDGET_MODE_TOTAL', async () => {
         const response = await request(app)
-          .post('/open_api/v1.3/campaign/create/')
+          .post('/tiktok/v1.3/campaign/create/')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send({
             advertiser_id: '123456',
@@ -471,7 +471,7 @@ describe('TikTok Marketing API', () => {
 
       it('should create campaign with BUDGET_MODE_INFINITE without budget', async () => {
         const response = await request(app)
-          .post('/open_api/v1.3/campaign/create/')
+          .post('/tiktok/v1.3/campaign/create/')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send({
             advertiser_id: '123456',
@@ -492,7 +492,7 @@ describe('TikTok Marketing API', () => {
 
       it('should fail when budget is missing for BUDGET_MODE_TOTAL', async () => {
         const response = await request(app)
-          .post('/open_api/v1.3/campaign/create/')
+          .post('/tiktok/v1.3/campaign/create/')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send({
             advertiser_id: '123456',
@@ -513,7 +513,7 @@ describe('TikTok Marketing API', () => {
     describe('POST /open_api/v1.3/campaign/update/', () => {
       it('should update campaign successfully', async () => {
         const response = await request(app)
-          .post('/open_api/v1.3/campaign/update/')
+          .post('/tiktok/v1.3/campaign/update/')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send({
             advertiser_id: '123456',
@@ -536,7 +536,7 @@ describe('TikTok Marketing API', () => {
 
       it('should fail with invalid operation_status', async () => {
         const response = await request(app)
-          .post('/open_api/v1.3/campaign/update/')
+          .post('/tiktok/v1.3/campaign/update/')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send({
             advertiser_id: '123456',
@@ -554,7 +554,7 @@ describe('TikTok Marketing API', () => {
 
       it('should update campaign with only operation_status', async () => {
         const response = await request(app)
-          .post('/open_api/v1.3/campaign/update/')
+          .post('/tiktok/v1.3/campaign/update/')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send({
             advertiser_id: '123456',
@@ -575,7 +575,7 @@ describe('TikTok Marketing API', () => {
 
       it('should update campaign without operation_status', async () => {
         const response = await request(app)
-          .post('/open_api/v1.3/campaign/update/')
+          .post('/tiktok/v1.3/campaign/update/')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send({
             advertiser_id: '123456',
@@ -596,7 +596,7 @@ describe('TikTok Marketing API', () => {
 
       it('should fail when missing advertiser_id', async () => {
         const response = await request(app)
-          .post('/open_api/v1.3/campaign/update/')
+          .post('/tiktok/v1.3/campaign/update/')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send({
             campaign_id: '1234567890123456789',
@@ -613,7 +613,7 @@ describe('TikTok Marketing API', () => {
 
       it('should fail when missing campaign_id', async () => {
         const response = await request(app)
-          .post('/open_api/v1.3/campaign/update/')
+          .post('/tiktok/v1.3/campaign/update/')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send({
             advertiser_id: '123456',
@@ -630,7 +630,7 @@ describe('TikTok Marketing API', () => {
 
       it('should fail with invalid budget', async () => {
         const response = await request(app)
-          .post('/open_api/v1.3/campaign/update/')
+          .post('/tiktok/v1.3/campaign/update/')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send({
             advertiser_id: '123456',
@@ -650,7 +650,7 @@ describe('TikTok Marketing API', () => {
     describe('GET /open_api/v1.3/campaign/get/', () => {
       it('should get campaign successfully', async () => {
         const response = await request(app)
-          .get('/open_api/v1.3/campaign/get/')
+          .get('/tiktok/v1.3/campaign/get/')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .query({
             advertiser_id: '123456'
@@ -685,7 +685,7 @@ describe('TikTok Marketing API', () => {
 
       it('should fail when missing advertiser_id', async () => {
         const response = await request(app)
-          .get('/open_api/v1.3/campaign/get/')
+          .get('/tiktok/v1.3/campaign/get/')
           .set('Authorization', `Bearer ${VALID_TOKEN}`);
 
         expect(response.status).toBe(400);
@@ -700,7 +700,7 @@ describe('TikTok Marketing API', () => {
         const campaignIds = ['1111111111111111111', '2222222222222222222'];
 
         const response = await request(app)
-          .get('/open_api/v1.3/campaign/get/')
+          .get('/tiktok/v1.3/campaign/get/')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .query({
             advertiser_id: '123456',
@@ -733,7 +733,7 @@ describe('TikTok Marketing API', () => {
 
       it('should fail with invalid campaign_ids format', async () => {
         const response = await request(app)
-          .get('/open_api/v1.3/campaign/get/')
+          .get('/tiktok/v1.3/campaign/get/')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .query({
             advertiser_id: '123456',
@@ -758,7 +758,7 @@ describe('TikTok Marketing API', () => {
     describe('Missing Authorization Header', () => {
       it('should return 401 for campaign creation without Authorization header', async () => {
         const response = await request(app)
-          .post('/open_api/v1.3/campaign/create/')
+          .post('/tiktok/v1.3/campaign/create/')
           .send({
             advertiser_id: '123456',
             campaign_name: 'Test Campaign',
@@ -777,7 +777,7 @@ describe('TikTok Marketing API', () => {
 
       it('should return 401 for campaign update without Authorization header', async () => {
         const response = await request(app)
-          .post('/open_api/v1.3/campaign/update/')
+          .post('/tiktok/v1.3/campaign/update/')
           .send({
             advertiser_id: '123456',
             campaign_id: '1234567890123456789',
@@ -794,7 +794,7 @@ describe('TikTok Marketing API', () => {
 
       it('should return 401 for campaign get without Authorization header', async () => {
         const response = await request(app)
-          .get('/open_api/v1.3/campaign/get/')
+          .get('/tiktok/v1.3/campaign/get/')
           .query({
             advertiser_id: '123456'
           });
@@ -811,7 +811,7 @@ describe('TikTok Marketing API', () => {
     describe('Invalid Bearer Token', () => {
       it('should return 401 for campaign creation with invalid token', async () => {
         const response = await request(app)
-          .post('/open_api/v1.3/campaign/create/')
+          .post('/tiktok/v1.3/campaign/create/')
           .set('Authorization', 'Bearer invalid_token_12345')
           .send({
             advertiser_id: '123456',
@@ -831,7 +831,7 @@ describe('TikTok Marketing API', () => {
 
       it('should return 401 for campaign update with invalid token', async () => {
         const response = await request(app)
-          .post('/open_api/v1.3/campaign/update/')
+          .post('/tiktok/v1.3/campaign/update/')
           .set('Authorization', 'Bearer invalid_token_12345')
           .send({
             advertiser_id: '123456',
@@ -849,7 +849,7 @@ describe('TikTok Marketing API', () => {
 
       it('should return 401 for campaign get with invalid token', async () => {
         const response = await request(app)
-          .get('/open_api/v1.3/campaign/get/')
+          .get('/tiktok/v1.3/campaign/get/')
           .set('Authorization', 'Bearer invalid_token_12345')
           .query({
             advertiser_id: '123456'
@@ -865,7 +865,7 @@ describe('TikTok Marketing API', () => {
 
       it('should return 401 with malformed Authorization header (no Bearer prefix)', async () => {
         const response = await request(app)
-          .post('/open_api/v1.3/campaign/create/')
+          .post('/tiktok/v1.3/campaign/create/')
           .set('Authorization', VALID_TOKEN) // Missing "Bearer " prefix
           .send({
             advertiser_id: '123456',
@@ -885,7 +885,7 @@ describe('TikTok Marketing API', () => {
 
       it('should return 401 with empty Bearer token', async () => {
         const response = await request(app)
-          .post('/open_api/v1.3/campaign/create/')
+          .post('/tiktok/v1.3/campaign/create/')
           .set('Authorization', 'Bearer ')
           .send({
             advertiser_id: '123456',
@@ -923,7 +923,7 @@ describe('TikTok Marketing API', () => {
 
       for (const objectiveType of objectiveTypes) {
         const response = await request(app)
-          .post('/open_api/v1.3/campaign/create/')
+          .post('/tiktok/v1.3/campaign/create/')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send({
             advertiser_id: '123456',
@@ -949,7 +949,7 @@ describe('TikTok Marketing API', () => {
 
       for (const operationStatus of operationStatuses) {
         const response = await request(app)
-          .post('/open_api/v1.3/campaign/update/')
+          .post('/tiktok/v1.3/campaign/update/')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send({
             advertiser_id: '123456',
@@ -1017,7 +1017,7 @@ describe('TikTok Marketing API', () => {
       const customState = 'my_custom_state_value_with_special_chars_!@#$%';
 
       const response = await request(app)
-        .get('/oauth/authorize')
+        .get('/tiktok/oauth/authorize')
         .query({
           client_key: VALID_CLIENT_KEY,
           response_type: 'code',
@@ -1033,7 +1033,7 @@ describe('TikTok Marketing API', () => {
 
     it('should work without state parameter in OAuth flow', async () => {
       const response = await request(app)
-        .get('/oauth/authorize')
+        .get('/tiktok/oauth/authorize')
         .query({
           client_key: VALID_CLIENT_KEY,
           response_type: 'code',

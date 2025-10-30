@@ -11,7 +11,7 @@ const router = Router();
 
 /**
  * LinkedIn Marketing API 202510 Routes
- * Base path: /rest
+ * Base path: /linkedin/rest
  *
  * All routes require:
  * - Authorization: Bearer {token}
@@ -24,7 +24,7 @@ router.use(validateLinkedInVersion);
 
 /**
  * Create Campaign
- * POST /rest/adCampaigns
+ * POST /linkedin/rest/adCampaigns
  *
  * Body:
  * {
@@ -44,7 +44,7 @@ router.post('/adCampaigns', createCampaign);
 
 /**
  * Get Campaign
- * GET /rest/adCampaigns/:id
+ * GET /linkedin/rest/adCampaigns/:id
  *
  * Params:
  * - id: Campaign URN (e.g., urn:li:sponsoredCampaign:456)
@@ -56,7 +56,7 @@ router.get('/adCampaigns/:id', getCampaign);
 
 /**
  * Update Campaign
- * POST /rest/adCampaigns/:id
+ * POST /linkedin/rest/adCampaigns/:id
  *
  * Params:
  * - id: Campaign URN (e.g., urn:li:sponsoredCampaign:456)

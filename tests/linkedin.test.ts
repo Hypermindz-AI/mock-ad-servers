@@ -28,11 +28,11 @@ describe('LinkedIn Marketing API 202510', () => {
 
   describe('OAuth Flow', () => {
 
-    describe('GET /oauth/v2/authorization', () => {
+    describe('GET /linkedin/oauth/v2/authorization', () => {
 
       it('should successfully authorize with valid parameters', async () => {
         const response = await request(app)
-          .get('/oauth/v2/authorization')
+          .get('/linkedin/oauth/v2/authorization')
           .query({
             response_type: 'code',
             client_id: VALID_CLIENT_ID,
@@ -49,7 +49,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should authorize with rw_ads scope', async () => {
         const response = await request(app)
-          .get('/oauth/v2/authorization')
+          .get('/linkedin/oauth/v2/authorization')
           .query({
             response_type: 'code',
             client_id: VALID_CLIENT_ID,
@@ -63,7 +63,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail when response_type is missing', async () => {
         const response = await request(app)
-          .get('/oauth/v2/authorization')
+          .get('/linkedin/oauth/v2/authorization')
           .query({
             client_id: VALID_CLIENT_ID,
             redirect_uri: 'https://example.com/callback',
@@ -77,7 +77,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail when response_type is not "code"', async () => {
         const response = await request(app)
-          .get('/oauth/v2/authorization')
+          .get('/linkedin/oauth/v2/authorization')
           .query({
             response_type: 'token',
             client_id: VALID_CLIENT_ID,
@@ -92,7 +92,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail when client_id is missing', async () => {
         const response = await request(app)
-          .get('/oauth/v2/authorization')
+          .get('/linkedin/oauth/v2/authorization')
           .query({
             response_type: 'code',
             redirect_uri: 'https://example.com/callback',
@@ -106,7 +106,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail when redirect_uri is missing', async () => {
         const response = await request(app)
-          .get('/oauth/v2/authorization')
+          .get('/linkedin/oauth/v2/authorization')
           .query({
             response_type: 'code',
             client_id: VALID_CLIENT_ID,
@@ -120,7 +120,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail when scope is missing', async () => {
         const response = await request(app)
-          .get('/oauth/v2/authorization')
+          .get('/linkedin/oauth/v2/authorization')
           .query({
             response_type: 'code',
             client_id: VALID_CLIENT_ID,
@@ -134,7 +134,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail when client_id is invalid', async () => {
         const response = await request(app)
-          .get('/oauth/v2/authorization')
+          .get('/linkedin/oauth/v2/authorization')
           .query({
             response_type: 'code',
             client_id: 'invalid_client_id',
@@ -149,7 +149,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail when scope does not include required permissions', async () => {
         const response = await request(app)
-          .get('/oauth/v2/authorization')
+          .get('/linkedin/oauth/v2/authorization')
           .query({
             response_type: 'code',
             client_id: VALID_CLIENT_ID,
@@ -167,7 +167,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should exchange authorization code for access token', async () => {
         const response = await request(app)
-          .post('/oauth/v2/accessToken')
+          .post('/linkedin/oauth/v2/accessToken')
           .type('form')
           .send({
             grant_type: 'authorization_code',
@@ -186,7 +186,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail with invalid Content-Type', async () => {
         const response = await request(app)
-          .post('/oauth/v2/accessToken')
+          .post('/linkedin/oauth/v2/accessToken')
           .set('Content-Type', 'application/json')
           .send({
             grant_type: 'authorization_code',
@@ -203,7 +203,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail when grant_type is missing', async () => {
         const response = await request(app)
-          .post('/oauth/v2/accessToken')
+          .post('/linkedin/oauth/v2/accessToken')
           .type('form')
           .send({
             code: 'mock_linkedin_auth_code_123456',
@@ -218,7 +218,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail when grant_type is not "authorization_code"', async () => {
         const response = await request(app)
-          .post('/oauth/v2/accessToken')
+          .post('/linkedin/oauth/v2/accessToken')
           .type('form')
           .send({
             grant_type: 'client_credentials',
@@ -234,7 +234,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail when code is missing', async () => {
         const response = await request(app)
-          .post('/oauth/v2/accessToken')
+          .post('/linkedin/oauth/v2/accessToken')
           .type('form')
           .send({
             grant_type: 'authorization_code',
@@ -250,7 +250,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail when client_id is missing', async () => {
         const response = await request(app)
-          .post('/oauth/v2/accessToken')
+          .post('/linkedin/oauth/v2/accessToken')
           .type('form')
           .send({
             grant_type: 'authorization_code',
@@ -266,7 +266,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail when client_secret is missing', async () => {
         const response = await request(app)
-          .post('/oauth/v2/accessToken')
+          .post('/linkedin/oauth/v2/accessToken')
           .type('form')
           .send({
             grant_type: 'authorization_code',
@@ -282,7 +282,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail when redirect_uri is missing', async () => {
         const response = await request(app)
-          .post('/oauth/v2/accessToken')
+          .post('/linkedin/oauth/v2/accessToken')
           .type('form')
           .send({
             grant_type: 'authorization_code',
@@ -298,7 +298,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail with invalid client_id', async () => {
         const response = await request(app)
-          .post('/oauth/v2/accessToken')
+          .post('/linkedin/oauth/v2/accessToken')
           .type('form')
           .send({
             grant_type: 'authorization_code',
@@ -315,7 +315,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail with invalid client_secret', async () => {
         const response = await request(app)
-          .post('/oauth/v2/accessToken')
+          .post('/linkedin/oauth/v2/accessToken')
           .type('form')
           .send({
             grant_type: 'authorization_code',
@@ -332,7 +332,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail with invalid authorization code', async () => {
         const response = await request(app)
-          .post('/oauth/v2/accessToken')
+          .post('/linkedin/oauth/v2/accessToken')
           .type('form')
           .send({
             grant_type: 'authorization_code',
@@ -359,7 +359,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should return 401 when Authorization header is missing', async () => {
         const response = await request(app)
-          .post('/rest/adCampaigns')
+          .post('/linkedin/rest/adCampaigns')
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
             account: 'urn:li:sponsoredAccount:123',
@@ -376,7 +376,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should return 401 when Authorization header format is invalid', async () => {
         const response = await request(app)
-          .post('/rest/adCampaigns')
+          .post('/linkedin/rest/adCampaigns')
           .set('Authorization', 'InvalidFormat token123')
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -393,7 +393,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should return 401 when Bearer token is missing', async () => {
         const response = await request(app)
-          .post('/rest/adCampaigns')
+          .post('/linkedin/rest/adCampaigns')
           .set('Authorization', 'Bearer ')
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -410,7 +410,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should return 401 when Bearer token is invalid', async () => {
         const response = await request(app)
-          .post('/rest/adCampaigns')
+          .post('/linkedin/rest/adCampaigns')
           .set('Authorization', 'Bearer invalid_token_12345')
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -428,7 +428,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should accept valid Bearer token', async () => {
         const response = await request(app)
-          .post('/rest/adCampaigns')
+          .post('/linkedin/rest/adCampaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -447,7 +447,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should return 400 when Linkedin-Version header is missing', async () => {
         const response = await request(app)
-          .post('/rest/adCampaigns')
+          .post('/linkedin/rest/adCampaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send({
             account: 'urn:li:sponsoredAccount:123',
@@ -464,7 +464,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should return 400 when Linkedin-Version header is invalid', async () => {
         const response = await request(app)
-          .post('/rest/adCampaigns')
+          .post('/linkedin/rest/adCampaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', '202409')
           .send({
@@ -482,7 +482,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should accept valid Linkedin-Version header', async () => {
         const response = await request(app)
-          .post('/rest/adCampaigns')
+          .post('/linkedin/rest/adCampaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -520,7 +520,7 @@ describe('LinkedIn Marketing API 202510', () => {
         };
 
         const response = await request(app)
-          .post('/rest/adCampaigns')
+          .post('/linkedin/rest/adCampaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send(campaignData);
@@ -551,7 +551,7 @@ describe('LinkedIn Marketing API 202510', () => {
         };
 
         const response = await request(app)
-          .post('/rest/adCampaigns')
+          .post('/linkedin/rest/adCampaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send(campaignData);
@@ -578,7 +578,7 @@ describe('LinkedIn Marketing API 202510', () => {
         };
 
         const response = await request(app)
-          .post('/rest/adCampaigns')
+          .post('/linkedin/rest/adCampaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send(campaignData);
@@ -590,7 +590,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail when account field is missing', async () => {
         const response = await request(app)
-          .post('/rest/adCampaigns')
+          .post('/linkedin/rest/adCampaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -608,7 +608,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail when name field is missing', async () => {
         const response = await request(app)
-          .post('/rest/adCampaigns')
+          .post('/linkedin/rest/adCampaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -623,7 +623,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail when type field is missing', async () => {
         const response = await request(app)
-          .post('/rest/adCampaigns')
+          .post('/linkedin/rest/adCampaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -638,7 +638,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail when status field is missing', async () => {
         const response = await request(app)
-          .post('/rest/adCampaigns')
+          .post('/linkedin/rest/adCampaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -653,7 +653,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail with invalid account URN format - missing prefix', async () => {
         const response = await request(app)
-          .post('/rest/adCampaigns')
+          .post('/linkedin/rest/adCampaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -672,7 +672,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail with invalid account URN format - wrong entity type', async () => {
         const response = await request(app)
-          .post('/rest/adCampaigns')
+          .post('/linkedin/rest/adCampaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -688,7 +688,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail with invalid account URN format - non-numeric ID', async () => {
         const response = await request(app)
-          .post('/rest/adCampaigns')
+          .post('/linkedin/rest/adCampaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -704,7 +704,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail with invalid campaign type', async () => {
         const response = await request(app)
-          .post('/rest/adCampaigns')
+          .post('/linkedin/rest/adCampaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -726,7 +726,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail with invalid campaign status', async () => {
         const response = await request(app)
-          .post('/rest/adCampaigns')
+          .post('/linkedin/rest/adCampaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -745,7 +745,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail when daily budget is missing amount', async () => {
         const response = await request(app)
-          .post('/rest/adCampaigns')
+          .post('/linkedin/rest/adCampaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -765,7 +765,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail when daily budget is missing currencyCode', async () => {
         const response = await request(app)
-          .post('/rest/adCampaigns')
+          .post('/linkedin/rest/adCampaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -784,7 +784,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail when daily budget amount is not a number', async () => {
         const response = await request(app)
-          .post('/rest/adCampaigns')
+          .post('/linkedin/rest/adCampaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -804,7 +804,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail when daily budget amount is zero', async () => {
         const response = await request(app)
-          .post('/rest/adCampaigns')
+          .post('/linkedin/rest/adCampaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -824,7 +824,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail when daily budget amount is negative', async () => {
         const response = await request(app)
-          .post('/rest/adCampaigns')
+          .post('/linkedin/rest/adCampaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -847,7 +847,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
         for (const type of types) {
           const response = await request(app)
-            .post('/rest/adCampaigns')
+            .post('/linkedin/rest/adCampaigns')
             .set('Authorization', `Bearer ${VALID_TOKEN}`)
             .set('Linkedin-Version', LINKEDIN_VERSION)
             .send({
@@ -867,7 +867,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
         for (const status of statuses) {
           const response = await request(app)
-            .post('/rest/adCampaigns')
+            .post('/linkedin/rest/adCampaigns')
             .set('Authorization', `Bearer ${VALID_TOKEN}`)
             .set('Linkedin-Version', LINKEDIN_VERSION)
             .send({
@@ -888,7 +888,7 @@ describe('LinkedIn Marketing API 202510', () => {
       it('should retrieve campaign by valid URN', async () => {
         // First create a campaign
         const createResponse = await request(app)
-          .post('/rest/adCampaigns')
+          .post('/linkedin/rest/adCampaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -920,7 +920,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should return 404 for non-existent campaign', async () => {
         const response = await request(app)
-          .get('/rest/adCampaigns/urn:li:sponsoredCampaign:999999')
+          .get('/linkedin/rest/adCampaigns/urn:li:sponsoredCampaign:999999')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION);
 
@@ -932,7 +932,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail with invalid campaign URN format', async () => {
         const response = await request(app)
-          .get('/rest/adCampaigns/invalid_urn')
+          .get('/linkedin/rest/adCampaigns/invalid_urn')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION);
 
@@ -943,7 +943,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should require authentication', async () => {
         const response = await request(app)
-          .get('/rest/adCampaigns/urn:li:sponsoredCampaign:123')
+          .get('/linkedin/rest/adCampaigns/urn:li:sponsoredCampaign:123')
           .set('Linkedin-Version', LINKEDIN_VERSION);
 
         expect(response.status).toBe(401);
@@ -951,7 +951,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should require version header', async () => {
         const response = await request(app)
-          .get('/rest/adCampaigns/urn:li:sponsoredCampaign:123')
+          .get('/linkedin/rest/adCampaigns/urn:li:sponsoredCampaign:123')
           .set('Authorization', `Bearer ${VALID_TOKEN}`);
 
         expect(response.status).toBe(400);
@@ -966,7 +966,7 @@ describe('LinkedIn Marketing API 202510', () => {
       beforeEach(async () => {
         // Create a campaign to update
         const createResponse = await request(app)
-          .post('/rest/adCampaigns')
+          .post('/linkedin/rest/adCampaigns')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({

@@ -20,10 +20,10 @@ describe('DV360 API v4 Tests', () => {
   // OAuth Flow Tests (shares Google OAuth)
   // ============================================
   describe('OAuth Flow Tests', () => {
-    describe('GET /oauth/authorize - successful authorization', () => {
+    describe('GET /google/oauth/authorize - successful authorization', () => {
       it('should successfully authorize with valid parameters', async () => {
         const response = await request(app)
-          .get('/oauth/authorize')
+          .get('/google/oauth/authorize')
           .query({
             client_id: VALID_CLIENT_ID,
             redirect_uri: VALID_REDIRECT_URI,
@@ -41,7 +41,7 @@ describe('DV360 API v4 Tests', () => {
         // Note: Current implementation validates adwords scope
         // DV360 should use doubleclickbidmanager scope, but shares Google OAuth
         const response = await request(app)
-          .get('/oauth/authorize')
+          .get('/google/oauth/authorize')
           .query({
             client_id: VALID_CLIENT_ID,
             redirect_uri: VALID_REDIRECT_URI,
@@ -54,13 +54,13 @@ describe('DV360 API v4 Tests', () => {
       });
     });
 
-    describe('POST /oauth/token - authorization_code grant', () => {
+    describe('POST /google/oauth/token - authorization_code grant', () => {
       let authorizationCode: string;
 
       beforeEach(async () => {
         // Get a valid authorization code first
         const authResponse = await request(app)
-          .get('/oauth/authorize')
+          .get('/google/oauth/authorize')
           .query({
             client_id: VALID_CLIENT_ID,
             redirect_uri: VALID_REDIRECT_URI,
@@ -72,7 +72,7 @@ describe('DV360 API v4 Tests', () => {
 
       it('should successfully exchange authorization code for tokens', async () => {
         const response = await request(app)
-          .post('/oauth/token')
+          .post('/google/oauth/token')
           .send({
             client_id: VALID_CLIENT_ID,
             client_secret: VALID_CLIENT_SECRET,
@@ -92,7 +92,7 @@ describe('DV360 API v4 Tests', () => {
 
       it('should fail with missing client credentials', async () => {
         const response = await request(app)
-          .post('/oauth/token')
+          .post('/google/oauth/token')
           .send({
             code: authorizationCode,
             grant_type: 'authorization_code',
@@ -106,7 +106,7 @@ describe('DV360 API v4 Tests', () => {
 
       it('should fail with invalid client credentials', async () => {
         const response = await request(app)
-          .post('/oauth/token')
+          .post('/google/oauth/token')
           .send({
             client_id: 'invalid_client_id',
             client_secret: 'invalid_secret',
@@ -122,7 +122,7 @@ describe('DV360 API v4 Tests', () => {
 
       it('should fail with invalid authorization code', async () => {
         const response = await request(app)
-          .post('/oauth/token')
+          .post('/google/oauth/token')
           .send({
             client_id: VALID_CLIENT_ID,
             client_secret: VALID_CLIENT_SECRET,
@@ -143,7 +143,7 @@ describe('DV360 API v4 Tests', () => {
       beforeEach(async () => {
         // Get a valid authorization code first
         const authResponse = await request(app)
-          .get('/oauth/authorize')
+          .get('/google/oauth/authorize')
           .query({
             client_id: VALID_CLIENT_ID,
             redirect_uri: VALID_REDIRECT_URI,
@@ -154,7 +154,7 @@ describe('DV360 API v4 Tests', () => {
 
         // Exchange for tokens
         const tokenResponse = await request(app)
-          .post('/oauth/token')
+          .post('/google/oauth/token')
           .send({
             client_id: VALID_CLIENT_ID,
             client_secret: VALID_CLIENT_SECRET,
@@ -168,7 +168,7 @@ describe('DV360 API v4 Tests', () => {
 
       it('should successfully refresh access token', async () => {
         const response = await request(app)
-          .post('/oauth/token')
+          .post('/google/oauth/token')
           .send({
             client_id: VALID_CLIENT_ID,
             client_secret: VALID_CLIENT_SECRET,
@@ -186,7 +186,7 @@ describe('DV360 API v4 Tests', () => {
 
       it('should fail with missing refresh_token', async () => {
         const response = await request(app)
-          .post('/oauth/token')
+          .post('/google/oauth/token')
           .send({
             client_id: VALID_CLIENT_ID,
             client_secret: VALID_CLIENT_SECRET,
@@ -200,7 +200,7 @@ describe('DV360 API v4 Tests', () => {
 
       it('should fail with invalid refresh_token', async () => {
         const response = await request(app)
-          .post('/oauth/token')
+          .post('/google/oauth/token')
           .send({
             client_id: VALID_CLIENT_ID,
             client_secret: VALID_CLIENT_SECRET,
@@ -241,7 +241,7 @@ describe('DV360 API v4 Tests', () => {
         };
 
         const response = await request(app)
-          .post(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
           .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
           .send(campaignData);
 
@@ -265,7 +265,7 @@ describe('DV360 API v4 Tests', () => {
         };
 
         const response = await request(app)
-          .post(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
           .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
           .send(campaignData);
 
@@ -287,7 +287,7 @@ describe('DV360 API v4 Tests', () => {
         };
 
         const response = await request(app)
-          .post(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
           .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
           .send(campaignData);
 
@@ -311,7 +311,7 @@ describe('DV360 API v4 Tests', () => {
         };
 
         const response = await request(app)
-          .post(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
           .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
           .send(campaignData);
 
@@ -330,7 +330,7 @@ describe('DV360 API v4 Tests', () => {
         };
 
         const response = await request(app)
-          .post(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
           .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
           .send(campaignData);
 
@@ -355,7 +355,7 @@ describe('DV360 API v4 Tests', () => {
           };
 
           const response = await request(app)
-            .post(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
+            .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
             .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
             .send(campaignData);
 
@@ -375,7 +375,7 @@ describe('DV360 API v4 Tests', () => {
         };
 
         const response = await request(app)
-          .post(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
           .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
           .send(campaignData);
 
@@ -408,7 +408,7 @@ describe('DV360 API v4 Tests', () => {
           };
 
           const response = await request(app)
-            .post(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
+            .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
             .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
             .send(campaignData);
 
@@ -430,7 +430,7 @@ describe('DV360 API v4 Tests', () => {
         };
 
         const response = await request(app)
-          .post(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
           .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
           .send(campaignData);
 
@@ -455,7 +455,7 @@ describe('DV360 API v4 Tests', () => {
         };
 
         const response = await request(app)
-          .post(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
           .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
           .send(campaignData);
 
@@ -474,7 +474,7 @@ describe('DV360 API v4 Tests', () => {
       beforeEach(async () => {
         // Create a campaign first
         const createResponse = await request(app)
-          .post(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
           .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
           .send({
             displayName: 'Campaign to Update',
@@ -490,7 +490,7 @@ describe('DV360 API v4 Tests', () => {
         };
 
         const response = await request(app)
-          .patch(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/${createdCampaignId}`)
+          .patch(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/${createdCampaignId}`)
           .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
           .send(updateData);
 
@@ -507,7 +507,7 @@ describe('DV360 API v4 Tests', () => {
         };
 
         const response = await request(app)
-          .patch(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/${createdCampaignId}`)
+          .patch(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/${createdCampaignId}`)
           .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
           .send(updateData);
 
@@ -522,7 +522,7 @@ describe('DV360 API v4 Tests', () => {
 
       beforeEach(async () => {
         const createResponse = await request(app)
-          .post(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
           .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
           .send({
             displayName: 'Campaign for Status Update',
@@ -537,7 +537,7 @@ describe('DV360 API v4 Tests', () => {
         };
 
         const response = await request(app)
-          .patch(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/${createdCampaignId}`)
+          .patch(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/${createdCampaignId}`)
           .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
           .send(updateData);
 
@@ -551,7 +551,7 @@ describe('DV360 API v4 Tests', () => {
         };
 
         const response = await request(app)
-          .patch(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/${createdCampaignId}`)
+          .patch(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/${createdCampaignId}`)
           .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
           .send(updateData);
 
@@ -565,7 +565,7 @@ describe('DV360 API v4 Tests', () => {
 
       beforeEach(async () => {
         const createResponse = await request(app)
-          .post(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
           .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
           .send({
             displayName: 'Campaign for Invalid Status Test',
@@ -580,7 +580,7 @@ describe('DV360 API v4 Tests', () => {
         };
 
         const response = await request(app)
-          .patch(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/${createdCampaignId}`)
+          .patch(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/${createdCampaignId}`)
           .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
           .send(updateData);
 
@@ -598,7 +598,7 @@ describe('DV360 API v4 Tests', () => {
       beforeEach(async () => {
         // Create a campaign first
         const createResponse = await request(app)
-          .post(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
           .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
           .send({
             displayName: 'Campaign to Retrieve',
@@ -612,7 +612,7 @@ describe('DV360 API v4 Tests', () => {
 
       it('should retrieve campaign successfully', async () => {
         const response = await request(app)
-          .get(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/${createdCampaignId}`)
+          .get(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/${createdCampaignId}`)
           .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`);
 
         expect(response.status).toBe(200);
@@ -625,7 +625,7 @@ describe('DV360 API v4 Tests', () => {
 
       it('should retrieve campaign with all fields', async () => {
         const response = await request(app)
-          .get(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/${createdCampaignId}`)
+          .get(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/${createdCampaignId}`)
           .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`);
 
         expect(response.status).toBe(200);
@@ -643,7 +643,7 @@ describe('DV360 API v4 Tests', () => {
         const nonExistentCampaignId = '888888888';
 
         const response = await request(app)
-          .get(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/${nonExistentCampaignId}`)
+          .get(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/${nonExistentCampaignId}`)
           .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`);
 
         expect(response.status).toBe(200);
@@ -666,7 +666,7 @@ describe('DV360 API v4 Tests', () => {
         };
 
         const response = await request(app)
-          .post(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
           .send(campaignData);
 
         expect(response.status).toBe(401);
@@ -683,7 +683,7 @@ describe('DV360 API v4 Tests', () => {
         };
 
         const response = await request(app)
-          .patch(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/123456`)
+          .patch(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/123456`)
           .send(updateData);
 
         expect(response.status).toBe(401);
@@ -694,7 +694,7 @@ describe('DV360 API v4 Tests', () => {
 
       it('should return 401 for GET request without Authorization header', async () => {
         const response = await request(app)
-          .get(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/123456`);
+          .get(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/123456`);
 
         expect(response.status).toBe(401);
         expect(response.body).toHaveProperty('error');
@@ -710,7 +710,7 @@ describe('DV360 API v4 Tests', () => {
         };
 
         const response = await request(app)
-          .post(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
           .set('Authorization', `Bearer ${INVALID_TOKEN}`)
           .send(campaignData);
 
@@ -726,7 +726,7 @@ describe('DV360 API v4 Tests', () => {
         };
 
         const response = await request(app)
-          .patch(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/123456`)
+          .patch(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/123456`)
           .set('Authorization', `Bearer ${INVALID_TOKEN}`)
           .send(updateData);
 
@@ -735,7 +735,7 @@ describe('DV360 API v4 Tests', () => {
 
       it('should return 401 for GET request with invalid Bearer token', async () => {
         const response = await request(app)
-          .get(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/123456`)
+          .get(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/123456`)
           .set('Authorization', `Bearer ${INVALID_TOKEN}`);
 
         expect(response.status).not.toBe(500);
@@ -747,7 +747,7 @@ describe('DV360 API v4 Tests', () => {
         };
 
         const response = await request(app)
-          .post(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
           .set('Authorization', 'InvalidFormat')
           .send(campaignData);
 
@@ -763,7 +763,7 @@ describe('DV360 API v4 Tests', () => {
         };
 
         const response = await request(app)
-          .post(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
           .set('Authorization', DV360_VALID_TOKEN)
           .send(campaignData);
 
@@ -779,7 +779,7 @@ describe('DV360 API v4 Tests', () => {
         };
 
         const response = await request(app)
-          .post(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
           .set('Authorization', 'Bearer')
           .send(campaignData);
 
@@ -795,7 +795,7 @@ describe('DV360 API v4 Tests', () => {
         };
 
         const response = await request(app)
-          .post(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
           .set('Authorization', 'Bearer ')
           .send(campaignData);
 
@@ -813,7 +813,7 @@ describe('DV360 API v4 Tests', () => {
         };
 
         const response = await request(app)
-          .post(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
           .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
           .send(campaignData);
 
@@ -827,7 +827,7 @@ describe('DV360 API v4 Tests', () => {
         };
 
         const response = await request(app)
-          .patch(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/123456`)
+          .patch(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/123456`)
           .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
           .send(updateData);
 
@@ -837,7 +837,7 @@ describe('DV360 API v4 Tests', () => {
 
       it('should accept valid Bearer token for GET request', async () => {
         const response = await request(app)
-          .get(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/123456`)
+          .get(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/123456`)
           .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`);
 
         expect(response.status).toBe(200);
@@ -856,7 +856,7 @@ describe('DV360 API v4 Tests', () => {
       };
 
       const response = await request(app)
-        .post(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
+        .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
         .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
         .send(campaignData);
 
@@ -873,7 +873,7 @@ describe('DV360 API v4 Tests', () => {
     it('should maintain correct resource name format across operations', async () => {
       // Create campaign
       const createResponse = await request(app)
-        .post(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
+        .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
         .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
         .send({
           displayName: 'Original Campaign',
@@ -886,7 +886,7 @@ describe('DV360 API v4 Tests', () => {
 
       // Update campaign
       const updateResponse = await request(app)
-        .patch(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/${campaignId}`)
+        .patch(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/${campaignId}`)
         .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
         .send({
           displayName: 'Updated Campaign',
@@ -896,7 +896,7 @@ describe('DV360 API v4 Tests', () => {
 
       // Get campaign
       const getResponse = await request(app)
-        .get(`/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/${campaignId}`)
+        .get(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns/${campaignId}`)
         .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`);
 
       expect(getResponse.body.name).toBe(expectedResourceName);

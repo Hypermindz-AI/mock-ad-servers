@@ -5,10 +5,10 @@ import { createCampaign, updateCampaign, getCampaign } from './controllers';
 /**
  * The Trade Desk API v3 Routes
  *
- * Base URL: /v3
+ * Base URL: /ttd/v3
  *
  * Authentication:
- * - POST /v3/authentication - Get token (no auth required)
+ * - POST /ttd/v3/authentication - Get token (no auth required)
  * - All other routes require TTD-Auth header
  */
 
@@ -16,7 +16,7 @@ const router: Router = express.Router();
 
 /**
  * Authentication endpoint (no auth required)
- * POST /v3/authentication
+ * POST /ttd/v3/authentication
  */
 router.post('/authentication', authenticate);
 
@@ -25,7 +25,7 @@ router.post('/authentication', authenticate);
  */
 
 /**
- * POST /v3/campaign
+ * POST /ttd/v3/campaign
  * Create a new campaign
  *
  * Headers:
@@ -45,7 +45,7 @@ router.post('/authentication', authenticate);
 router.post('/campaign', validateTTDAuth, createCampaign);
 
 /**
- * PUT /v3/campaign/:id
+ * PUT /ttd/v3/campaign/:id
  * Update an existing campaign
  *
  * Headers:
@@ -60,7 +60,7 @@ router.post('/campaign', validateTTDAuth, createCampaign);
 router.put('/campaign/:id', validateTTDAuth, updateCampaign);
 
 /**
- * GET /v3/campaign/:id
+ * GET /ttd/v3/campaign/:id
  * Get campaign details
  *
  * Headers:

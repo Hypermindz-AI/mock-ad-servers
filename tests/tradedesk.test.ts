@@ -5,7 +5,7 @@ import app from '../src/index';
  * The Trade Desk API v3 - Comprehensive Test Suite
  *
  * Tests for token-based authentication and campaign CRUD operations
- * Base URL: /v3
+ * Base URL: /ttd/v3
  * Auth Header: TTD-Auth (NOT Authorization)
  * Format: PascalCase for all requests and responses
  */
@@ -22,11 +22,11 @@ describe('The Trade Desk API v3', () => {
   // Authentication Tests
   // ============================================
 
-  describe('POST /v3/authentication', () => {
+  describe('POST /ttd/v3/authentication', () => {
 
     it('should successfully authenticate with valid credentials', async () => {
       const response = await request(app)
-        .post('/v3/authentication')
+        .post('/ttd/v3/authentication')
         .send({
           Login: TTD_USERNAME,
           Password: TTD_PASSWORD,
@@ -53,7 +53,7 @@ describe('The Trade Desk API v3', () => {
 
     it('should return 400 when Login is missing', async () => {
       const response = await request(app)
-        .post('/v3/authentication')
+        .post('/ttd/v3/authentication')
         .send({
           Password: TTD_PASSWORD,
         })
@@ -65,7 +65,7 @@ describe('The Trade Desk API v3', () => {
 
     it('should return 400 when Password is missing', async () => {
       const response = await request(app)
-        .post('/v3/authentication')
+        .post('/ttd/v3/authentication')
         .send({
           Login: TTD_USERNAME,
         })
@@ -77,7 +77,7 @@ describe('The Trade Desk API v3', () => {
 
     it('should return 400 when both Login and Password are missing', async () => {
       const response = await request(app)
-        .post('/v3/authentication')
+        .post('/ttd/v3/authentication')
         .send({})
         .expect(400);
 
@@ -87,7 +87,7 @@ describe('The Trade Desk API v3', () => {
 
     it('should return 401 with invalid credentials (invalid Login)', async () => {
       const response = await request(app)
-        .post('/v3/authentication')
+        .post('/ttd/v3/authentication')
         .send({
           Login: 'invalid_username',
           Password: TTD_PASSWORD,
@@ -100,7 +100,7 @@ describe('The Trade Desk API v3', () => {
 
     it('should return 401 with invalid credentials (invalid Password)', async () => {
       const response = await request(app)
-        .post('/v3/authentication')
+        .post('/ttd/v3/authentication')
         .send({
           Login: TTD_USERNAME,
           Password: 'invalid_password',
@@ -647,7 +647,7 @@ describe('The Trade Desk API v3', () => {
 
       it('should return 401 when TTD-Auth header is missing', async () => {
         const response = await request(app)
-          .post('/v3/campaign')
+          .post('/ttd/v3/campaign')
           .send(validCampaignData)
           .expect(401);
 
@@ -657,7 +657,7 @@ describe('The Trade Desk API v3', () => {
 
       it('should return 401 when TTD-Auth token is invalid', async () => {
         const response = await request(app)
-          .post('/v3/campaign')
+          .post('/ttd/v3/campaign')
           .set('TTD-Auth', INVALID_TOKEN)
           .send(validCampaignData)
           .expect(401);
@@ -668,7 +668,7 @@ describe('The Trade Desk API v3', () => {
 
       it('should NOT accept Authorization header (must use TTD-Auth)', async () => {
         const response = await request(app)
-          .post('/v3/campaign')
+          .post('/ttd/v3/campaign')
           .set('Authorization', `Bearer ${TTD_VALID_TOKEN}`)
           .send(validCampaignData)
           .expect(401);
@@ -679,7 +679,7 @@ describe('The Trade Desk API v3', () => {
 
       it('should return 401 with empty TTD-Auth token', async () => {
         const response = await request(app)
-          .post('/v3/campaign')
+          .post('/ttd/v3/campaign')
           .set('TTD-Auth', '')
           .send(validCampaignData)
           .expect(401);
@@ -690,7 +690,7 @@ describe('The Trade Desk API v3', () => {
 
       it('should successfully authenticate with valid TTD-Auth header', async () => {
         const response = await request(app)
-          .post('/v3/campaign')
+          .post('/ttd/v3/campaign')
           .set('TTD-Auth', TTD_VALID_TOKEN)
           .send(validCampaignData)
           .expect(200);
@@ -704,7 +704,7 @@ describe('The Trade Desk API v3', () => {
 
       it('should return 401 when TTD-Auth header is missing', async () => {
         const response = await request(app)
-          .put('/v3/campaign/test_123')
+          .put('/ttd/v3/campaign/test_123')
           .send({ CampaignName: 'Updated Name' })
           .expect(401);
 
@@ -714,7 +714,7 @@ describe('The Trade Desk API v3', () => {
 
       it('should return 401 when TTD-Auth token is invalid', async () => {
         const response = await request(app)
-          .put('/v3/campaign/test_123')
+          .put('/ttd/v3/campaign/test_123')
           .set('TTD-Auth', INVALID_TOKEN)
           .send({ CampaignName: 'Updated Name' })
           .expect(401);
@@ -725,7 +725,7 @@ describe('The Trade Desk API v3', () => {
 
       it('should return 401 with empty TTD-Auth token', async () => {
         const response = await request(app)
-          .put('/v3/campaign/test_123')
+          .put('/ttd/v3/campaign/test_123')
           .set('TTD-Auth', '')
           .send({ Availability: 'Paused' })
           .expect(401);
@@ -736,7 +736,7 @@ describe('The Trade Desk API v3', () => {
 
       it('should successfully authenticate with valid TTD-Auth header', async () => {
         const response = await request(app)
-          .put('/v3/campaign/test_123')
+          .put('/ttd/v3/campaign/test_123')
           .set('TTD-Auth', TTD_VALID_TOKEN)
           .send({ CampaignName: 'Updated Name' })
           .expect(200);
@@ -750,7 +750,7 @@ describe('The Trade Desk API v3', () => {
 
       it('should return 401 when TTD-Auth header is missing', async () => {
         const response = await request(app)
-          .get('/v3/campaign/test_123')
+          .get('/ttd/v3/campaign/test_123')
           .expect(401);
 
         expect(response.body).toHaveProperty('Message');
@@ -759,7 +759,7 @@ describe('The Trade Desk API v3', () => {
 
       it('should return 401 when TTD-Auth token is invalid', async () => {
         const response = await request(app)
-          .get('/v3/campaign/test_123')
+          .get('/ttd/v3/campaign/test_123')
           .set('TTD-Auth', INVALID_TOKEN)
           .expect(401);
 
@@ -769,7 +769,7 @@ describe('The Trade Desk API v3', () => {
 
       it('should return 401 with empty TTD-Auth token', async () => {
         const response = await request(app)
-          .get('/v3/campaign/test_123')
+          .get('/ttd/v3/campaign/test_123')
           .set('TTD-Auth', '')
           .expect(401);
 
@@ -779,7 +779,7 @@ describe('The Trade Desk API v3', () => {
 
       it('should successfully authenticate with valid TTD-Auth header', async () => {
         const response = await request(app)
-          .get('/v3/campaign/test_123')
+          .get('/ttd/v3/campaign/test_123')
           .set('TTD-Auth', TTD_VALID_TOKEN)
           .expect(200);
 
@@ -789,7 +789,7 @@ describe('The Trade Desk API v3', () => {
 
       it('should NOT accept Authorization header (must use TTD-Auth)', async () => {
         const response = await request(app)
-          .get('/v3/campaign/test_123')
+          .get('/ttd/v3/campaign/test_123')
           .set('Authorization', `Bearer ${TTD_VALID_TOKEN}`)
           .expect(401);
 
@@ -809,7 +809,7 @@ describe('The Trade Desk API v3', () => {
 
       it('should handle GET request without campaign ID in path', async () => {
         const response = await request(app)
-          .get('/v3/campaign/')
+          .get('/ttd/v3/campaign/')
           .set('TTD-Auth', TTD_VALID_TOKEN);
 
         // Should get 404 or similar error (route not found)
@@ -818,7 +818,7 @@ describe('The Trade Desk API v3', () => {
 
       it('should handle PUT request without campaign ID in path', async () => {
         const response = await request(app)
-          .put('/v3/campaign/')
+          .put('/ttd/v3/campaign/')
           .set('TTD-Auth', TTD_VALID_TOKEN)
           .send({ CampaignName: 'Test' });
 
@@ -831,7 +831,7 @@ describe('The Trade Desk API v3', () => {
 
       it('should handle empty request body for POST /v3/campaign', async () => {
         const response = await request(app)
-          .post('/v3/campaign')
+          .post('/ttd/v3/campaign')
           .set('TTD-Auth', TTD_VALID_TOKEN)
           .send({})
           .expect(400);
@@ -842,7 +842,7 @@ describe('The Trade Desk API v3', () => {
 
       it('should handle null values in campaign creation', async () => {
         const response = await request(app)
-          .post('/v3/campaign')
+          .post('/ttd/v3/campaign')
           .set('TTD-Auth', TTD_VALID_TOKEN)
           .send({
             CampaignName: null,
@@ -861,7 +861,7 @@ describe('The Trade Desk API v3', () => {
 
       it('should verify TTD-Auth header is case-insensitive (lowercase)', async () => {
         const response = await request(app)
-          .get('/v3/campaign/test_123')
+          .get('/ttd/v3/campaign/test_123')
           .set('ttd-auth', TTD_VALID_TOKEN)
           .expect(200);
 
@@ -870,7 +870,7 @@ describe('The Trade Desk API v3', () => {
 
       it('should verify PascalCase is preserved in responses', async () => {
         const response = await request(app)
-          .post('/v3/authentication')
+          .post('/ttd/v3/authentication')
           .send({
             Login: TTD_USERNAME,
             Password: TTD_PASSWORD,
@@ -913,7 +913,7 @@ describe('The Trade Desk API v3', () => {
         const responses = await Promise.all(
           campaigns.map(campaign =>
             request(app)
-              .post('/v3/campaign')
+              .post('/ttd/v3/campaign')
               .set('TTD-Auth', TTD_VALID_TOKEN)
               .send(campaign)
           )
@@ -940,7 +940,7 @@ describe('The Trade Desk API v3', () => {
 
       it('should accept very large budget amounts', async () => {
         const response = await request(app)
-          .post('/v3/campaign')
+          .post('/ttd/v3/campaign')
           .set('TTD-Auth', TTD_VALID_TOKEN)
           .send({
             CampaignName: 'Large Budget Campaign',
@@ -958,7 +958,7 @@ describe('The Trade Desk API v3', () => {
 
       it('should accept decimal budget amounts', async () => {
         const response = await request(app)
-          .post('/v3/campaign')
+          .post('/ttd/v3/campaign')
           .set('TTD-Auth', TTD_VALID_TOKEN)
           .send({
             CampaignName: 'Decimal Budget Campaign',
