@@ -264,7 +264,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const response = await request(app)
-          .post(`/v23.0/act_${adAccountId}/campaigns`)
+          .post(`/meta/v23.0/act_${adAccountId}/campaigns`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(campaignData);
 
@@ -286,7 +286,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const response = await request(app)
-          .post(`/v23.0/act_${adAccountId}/campaigns`)
+          .post(`/meta/v23.0/act_${adAccountId}/campaigns`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(campaignData);
 
@@ -308,7 +308,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const response = await request(app)
-          .post(`/v23.0/act_${adAccountId}/campaigns`)
+          .post(`/meta/v23.0/act_${adAccountId}/campaigns`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(campaignData);
 
@@ -325,7 +325,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const response = await request(app)
-          .post(`/v23.0/act_${adAccountId}/campaigns`)
+          .post(`/meta/v23.0/act_${adAccountId}/campaigns`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(campaignData);
 
@@ -345,7 +345,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const response = await request(app)
-          .post(`/v23.0/act_${adAccountId}/campaigns`)
+          .post(`/meta/v23.0/act_${adAccountId}/campaigns`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(campaignData);
 
@@ -365,7 +365,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const response = await request(app)
-          .post(`/v23.0/act_${adAccountId}/campaigns`)
+          .post(`/meta/v23.0/act_${adAccountId}/campaigns`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(campaignData);
 
@@ -386,7 +386,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const response = await request(app)
-          .post(`/v23.0/act_${adAccountId}/campaigns`)
+          .post(`/meta/v23.0/act_${adAccountId}/campaigns`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(campaignData);
 
@@ -408,7 +408,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const response = await request(app)
-          .post(`/v23.0/act_${adAccountId}/campaigns`)
+          .post(`/meta/v23.0/act_${adAccountId}/campaigns`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(campaignData);
 
@@ -429,7 +429,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const response = await request(app)
-          .post(`/v23.0/act_${adAccountId}/campaigns`)
+          .post(`/meta/v23.0/act_${adAccountId}/campaigns`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(campaignData);
 
@@ -450,7 +450,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const response = await request(app)
-          .post(`/v23.0/act_${adAccountId}/campaigns`)
+          .post(`/meta/v23.0/act_${adAccountId}/campaigns`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(campaignData);
 
@@ -472,7 +472,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const response = await request(app)
-          .post(`/v23.0/act_${adAccountId}/campaigns`)
+          .post(`/meta/v23.0/act_${adAccountId}/campaigns`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(campaignData);
 
@@ -494,7 +494,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const response = await request(app)
-          .post(`/v23.0/act_${adAccountId}/campaigns`)
+          .post(`/meta/v23.0/act_${adAccountId}/campaigns`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(campaignData);
 
@@ -516,7 +516,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const response = await request(app)
-          .post(`/v23.0/act_${adAccountId}/campaigns`)
+          .post(`/meta/v23.0/act_${adAccountId}/campaigns`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(campaignData);
 
@@ -535,7 +535,7 @@ describe('Meta Marketing API v23.0', () => {
         const campaignId = '120210000000000000';
 
         const response = await request(app)
-          .get(`/v23.0/${campaignId}`)
+          .get(`/meta/v23.0/${campaignId}`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`);
 
         expect(response.status).toBe(200);
@@ -566,7 +566,7 @@ describe('Meta Marketing API v23.0', () => {
 
         // Then retrieve it
         const getResponse = await request(app)
-          .get(`/v23.0/${campaignId}`)
+          .get(`/meta/v23.0/${campaignId}`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`);
 
         expect(getResponse.status).toBe(200);
@@ -581,7 +581,7 @@ describe('Meta Marketing API v23.0', () => {
         const nonExistentCampaignId = '999999999999999999';
 
         const response = await request(app)
-          .get(`/v23.0/${nonExistentCampaignId}`)
+          .get(`/meta/v23.0/${nonExistentCampaignId}`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`);
 
         expect(response.status).toBe(404);
@@ -616,7 +616,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const updateResponse = await request(app)
-          .post(`/v23.0/${campaignId}`)
+          .post(`/meta/v23.0/${campaignId}`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(updateData);
 
@@ -627,7 +627,7 @@ describe('Meta Marketing API v23.0', () => {
 
         // Verify the update persisted
         const getResponse = await request(app)
-          .get(`/v23.0/${campaignId}`)
+          .get(`/meta/v23.0/${campaignId}`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`);
 
         expect(getResponse.body.name).toBe(updateData.name);
@@ -655,7 +655,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const updateResponse = await request(app)
-          .post(`/v23.0/${campaignId}`)
+          .post(`/meta/v23.0/${campaignId}`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(updateData);
 
@@ -686,7 +686,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const updateResponse = await request(app)
-          .post(`/v23.0/${campaignId}`)
+          .post(`/meta/v23.0/${campaignId}`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(updateData);
 
@@ -719,7 +719,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const updateResponse = await request(app)
-          .post(`/v23.0/${campaignId}`)
+          .post(`/meta/v23.0/${campaignId}`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(updateData);
 
@@ -771,7 +771,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const updateResponse = await request(app)
-          .post(`/v23.0/${campaignId}`)
+          .post(`/meta/v23.0/${campaignId}`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(updateData);
 
@@ -805,7 +805,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const updateResponse = await request(app)
-          .post(`/v23.0/${campaignId}`)
+          .post(`/meta/v23.0/${campaignId}`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(updateData);
 
@@ -839,7 +839,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const updateResponse = await request(app)
-          .post(`/v23.0/${campaignId}`)
+          .post(`/meta/v23.0/${campaignId}`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(updateData);
 
@@ -873,7 +873,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const updateResponse = await request(app)
-          .post(`/v23.0/${campaignId}`)
+          .post(`/meta/v23.0/${campaignId}`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(updateData);
 
@@ -903,7 +903,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const response = await request(app)
-          .post(`/v23.0/act_${adAccountId}/campaigns`)
+          .post(`/meta/v23.0/act_${adAccountId}/campaigns`)
           .send(campaignData);
 
         expect(response.status).toBe(401);
@@ -918,7 +918,7 @@ describe('Meta Marketing API v23.0', () => {
         const campaignId = '120210000000000000';
 
         const response = await request(app)
-          .get(`/v23.0/${campaignId}`);
+          .get(`/meta/v23.0/${campaignId}`);
 
         expect(response.status).toBe(401);
         expect(response.body).toHaveProperty('error');
@@ -935,7 +935,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const response = await request(app)
-          .post(`/v23.0/${campaignId}`)
+          .post(`/meta/v23.0/${campaignId}`)
           .send(updateData);
 
         expect(response.status).toBe(401);
@@ -957,7 +957,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const response = await request(app)
-          .post(`/v23.0/act_${adAccountId}/campaigns`)
+          .post(`/meta/v23.0/act_${adAccountId}/campaigns`)
           .set('Authorization', `Bearer ${INVALID_TOKEN}`)
           .send(campaignData);
 
@@ -973,7 +973,7 @@ describe('Meta Marketing API v23.0', () => {
         const campaignId = '120210000000000000';
 
         const response = await request(app)
-          .get(`/v23.0/${campaignId}`)
+          .get(`/meta/v23.0/${campaignId}`)
           .set('Authorization', `Bearer ${INVALID_TOKEN}`);
 
         expect(response.status).toBe(401);
@@ -991,7 +991,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const response = await request(app)
-          .post(`/v23.0/${campaignId}`)
+          .post(`/meta/v23.0/${campaignId}`)
           .set('Authorization', `Bearer ${INVALID_TOKEN}`)
           .send(updateData);
 
@@ -1012,7 +1012,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const response = await request(app)
-          .post(`/v23.0/act_${adAccountId}/campaigns`)
+          .post(`/meta/v23.0/act_${adAccountId}/campaigns`)
           .set('Authorization', VALID_TOKEN)
           .send(campaignData);
 
@@ -1033,7 +1033,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const response = await request(app)
-          .post(`/v23.0/act_${adAccountId}/campaigns`)
+          .post(`/meta/v23.0/act_${adAccountId}/campaigns`)
           .set('Authorization', `Basic ${VALID_TOKEN}`)
           .send(campaignData);
 
@@ -1057,7 +1057,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const response = await request(app)
-          .post(`/v23.0/act_${adAccountId}/campaigns`)
+          .post(`/meta/v23.0/act_${adAccountId}/campaigns`)
           .query({ access_token: VALID_TOKEN })
           .send(campaignData);
 
@@ -1070,7 +1070,7 @@ describe('Meta Marketing API v23.0', () => {
         const campaignId = '120210000000000000';
 
         const response = await request(app)
-          .get(`/v23.0/${campaignId}`)
+          .get(`/meta/v23.0/${campaignId}`)
           .query({ access_token: VALID_TOKEN });
 
         expect(response.status).toBe(200);
@@ -1087,7 +1087,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const createResponse = await request(app)
-          .post(`/v23.0/act_${adAccountId}/campaigns`)
+          .post(`/meta/v23.0/act_${adAccountId}/campaigns`)
           .query({ access_token: VALID_TOKEN })
           .send(campaignData);
 
@@ -1099,7 +1099,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const updateResponse = await request(app)
-          .post(`/v23.0/${campaignId}`)
+          .post(`/meta/v23.0/${campaignId}`)
           .query({ access_token: VALID_TOKEN })
           .send(updateData);
 
@@ -1117,7 +1117,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const response = await request(app)
-          .post(`/v23.0/act_${adAccountId}/campaigns`)
+          .post(`/meta/v23.0/act_${adAccountId}/campaigns`)
           .query({ access_token: INVALID_TOKEN })
           .send(campaignData);
 
@@ -1139,7 +1139,7 @@ describe('Meta Marketing API v23.0', () => {
 
         // Valid token in header, invalid in query - should succeed
         const response = await request(app)
-          .post(`/v23.0/act_${adAccountId}/campaigns`)
+          .post(`/meta/v23.0/act_${adAccountId}/campaigns`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .query({ access_token: INVALID_TOKEN })
           .send(campaignData);

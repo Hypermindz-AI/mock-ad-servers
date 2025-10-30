@@ -494,7 +494,9 @@ describe('LinkedIn Marketing API 202510', () => {
 
         // Should not get 400 for version error
         expect(response.status).not.toBe(400);
-        expect(response.body.message).not.toContain('Linkedin-Version');
+        if (response.body.message) {
+          expect(response.body.message).not.toContain('Linkedin-Version');
+        }
       });
     });
   });
@@ -906,7 +908,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
         // Now retrieve it
         const response = await request(app)
-          .get(`/rest/adCampaigns/${campaignId}`)
+          .get(`/linkedin/rest/adCampaigns/${campaignId}`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION);
 
@@ -985,7 +987,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should update campaign name', async () => {
         const response = await request(app)
-          .post(`/rest/adCampaigns/${campaignId}`)
+          .post(`/linkedin/rest/adCampaigns/${campaignId}`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -1000,7 +1002,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should update campaign status', async () => {
         const response = await request(app)
-          .post(`/rest/adCampaigns/${campaignId}`)
+          .post(`/linkedin/rest/adCampaigns/${campaignId}`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -1013,7 +1015,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should update daily budget', async () => {
         const response = await request(app)
-          .post(`/rest/adCampaigns/${campaignId}`)
+          .post(`/linkedin/rest/adCampaigns/${campaignId}`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -1029,7 +1031,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should update multiple fields at once', async () => {
         const response = await request(app)
-          .post(`/rest/adCampaigns/${campaignId}`)
+          .post(`/linkedin/rest/adCampaigns/${campaignId}`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -1049,7 +1051,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should not change campaign ID during update', async () => {
         const response = await request(app)
-          .post(`/rest/adCampaigns/${campaignId}`)
+          .post(`/linkedin/rest/adCampaigns/${campaignId}`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -1063,7 +1065,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should not change account during update', async () => {
         const response = await request(app)
-          .post(`/rest/adCampaigns/${campaignId}`)
+          .post(`/linkedin/rest/adCampaigns/${campaignId}`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -1077,7 +1079,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should return 404 for non-existent campaign', async () => {
         const response = await request(app)
-          .post('/rest/adCampaigns/urn:li:sponsoredCampaign:999999')
+          .post('/linkedin/rest/adCampaigns/urn:li:sponsoredCampaign:999999')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -1090,7 +1092,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail with invalid campaign URN format', async () => {
         const response = await request(app)
-          .post('/rest/adCampaigns/invalid_urn')
+          .post('/linkedin/rest/adCampaigns/invalid_urn')
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -1103,7 +1105,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail when updating with invalid campaign type', async () => {
         const response = await request(app)
-          .post(`/rest/adCampaigns/${campaignId}`)
+          .post(`/linkedin/rest/adCampaigns/${campaignId}`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -1116,7 +1118,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail when updating with invalid status', async () => {
         const response = await request(app)
-          .post(`/rest/adCampaigns/${campaignId}`)
+          .post(`/linkedin/rest/adCampaigns/${campaignId}`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -1129,7 +1131,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should fail when updating with invalid budget format', async () => {
         const response = await request(app)
-          .post(`/rest/adCampaigns/${campaignId}`)
+          .post(`/linkedin/rest/adCampaigns/${campaignId}`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
@@ -1145,7 +1147,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should require authentication for update', async () => {
         const response = await request(app)
-          .post(`/rest/adCampaigns/${campaignId}`)
+          .post(`/linkedin/rest/adCampaigns/${campaignId}`)
           .set('Linkedin-Version', LINKEDIN_VERSION)
           .send({
             name: 'Unauthorized Update'
@@ -1156,7 +1158,7 @@ describe('LinkedIn Marketing API 202510', () => {
 
       it('should require version header for update', async () => {
         const response = await request(app)
-          .post(`/rest/adCampaigns/${campaignId}`)
+          .post(`/linkedin/rest/adCampaigns/${campaignId}`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send({
             name: 'No Version Header Update'

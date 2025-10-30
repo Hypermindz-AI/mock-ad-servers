@@ -25,7 +25,7 @@ Complete API reference for all 6 mock ad server platforms. This document provide
 #### 1. Get Authorization Code
 
 ```http
-GET /oauth/authorize
+GET /google/oauth/authorize
 ```
 
 **Query Parameters:**
@@ -38,7 +38,7 @@ GET /oauth/authorize
 
 **Example Request:**
 ```bash
-curl "http://localhost:3000/oauth/authorize?client_id=mock_google_client_id&redirect_uri=http://localhost/callback&response_type=code&scope=https://www.googleapis.com/auth/adwords"
+curl "http://localhost:3000/google/oauth/authorize?client_id=mock_google_client_id&redirect_uri=http://localhost/callback&response_type=code&scope=https://www.googleapis.com/auth/adwords"
 ```
 
 **Success Response (302 Redirect):**
@@ -49,7 +49,7 @@ Location: http://localhost/callback?code=mock_google_auth_code_123456
 #### 2. Exchange Authorization Code for Token
 
 ```http
-POST /oauth/token
+POST /google/oauth/token
 Content-Type: application/json
 ```
 
@@ -77,7 +77,7 @@ Content-Type: application/json
 #### 3. Refresh Access Token
 
 ```http
-POST /oauth/token
+POST /google/oauth/token
 Content-Type: application/json
 ```
 
@@ -229,7 +229,7 @@ Content-Type: application/json
 
 ## Meta Marketing API v23.0
 
-**Base URL**: `/v23.0`
+**Base URL**: `/meta/v23.0`
 **Authentication**: OAuth 2.0
 **API Version**: v23.0 (May 2025)
 
@@ -238,7 +238,7 @@ Content-Type: application/json
 #### 1. Get Authorization Code
 
 ```http
-GET /v23.0/dialog/oauth
+GET /meta/v23.0/dialog/oauth
 ```
 
 **Query Parameters:**
@@ -251,13 +251,13 @@ GET /v23.0/dialog/oauth
 
 **Example Request:**
 ```bash
-curl "http://localhost:3000/v23.0/dialog/oauth?client_id=mock_meta_app_id_123456&redirect_uri=http://localhost/callback&response_type=code"
+curl "http://localhost:3000/meta/v23.0/dialog/oauth?client_id=mock_meta_app_id_123456&redirect_uri=http://localhost/callback&response_type=code"
 ```
 
 #### 2. Get Access Token
 
 ```http
-GET /v23.0/oauth/access_token
+GET /meta/v23.0/oauth/access_token
 ```
 
 **Query Parameters (Authorization Code Flow):**
@@ -289,7 +289,7 @@ GET /v23.0/oauth/access_token
 #### Create Campaign
 
 ```http
-POST /v23.0/act_{ad_account_id}/campaigns
+POST /meta/v23.0/act_{ad_account_id}/campaigns
 Authorization: Bearer {access_token}
 Content-Type: application/json
 ```
@@ -336,13 +336,13 @@ Content-Type: application/json
 #### Get Campaign
 
 ```http
-GET /v23.0/{campaign_id}
+GET /meta/v23.0/{campaign_id}
 Authorization: Bearer {access_token}
 ```
 
 **Alternative Authentication (Query Parameter):**
 ```http
-GET /v23.0/{campaign_id}?access_token={access_token}
+GET /meta/v23.0/{campaign_id}?access_token={access_token}
 ```
 
 **Success Response (200):**
@@ -407,7 +407,7 @@ Content-Type: application/json
 
 ## LinkedIn Marketing API 202510
 
-**Base URL**: `/rest`
+**Base URL**: `/linkedin/rest`
 **Authentication**: OAuth 2.0 (3-legged)
 **API Version**: 202510 (October 2025)
 **Special Header Required**: `Linkedin-Version: 202510`
@@ -417,7 +417,7 @@ Content-Type: application/json
 #### 1. Get Authorization Code
 
 ```http
-GET /oauth/v2/authorization
+GET /linkedin/oauth/v2/authorization
 ```
 
 **Query Parameters:**
@@ -434,13 +434,13 @@ GET /oauth/v2/authorization
 
 **Example Request:**
 ```bash
-curl "http://localhost:3000/oauth/v2/authorization?response_type=code&client_id=mock_linkedin_client_id_345678&redirect_uri=http://localhost/callback&scope=r_ads%20rw_ads"
+curl "http://localhost:3000/google/oauth/v2/authorization?response_type=code&client_id=mock_linkedin_client_id_345678&redirect_uri=http://localhost/callback&scope=r_ads%20rw_ads"
 ```
 
 #### 2. Get Access Token
 
 ```http
-POST /oauth/v2/accessToken
+POST /linkedin/oauth/v2/accessToken
 Content-Type: application/x-www-form-urlencoded
 ```
 
@@ -469,7 +469,7 @@ grant_type=authorization_code
 #### Create Campaign
 
 ```http
-POST /rest/adCampaigns
+POST /linkedin/rest/adCampaigns
 Authorization: Bearer {access_token}
 Linkedin-Version: 202510
 Content-Type: application/json
@@ -517,7 +517,7 @@ Content-Type: application/json
 #### Get Campaign
 
 ```http
-GET /rest/adCampaigns/{campaign_urn}
+GET /linkedin/rest/adCampaigns/{campaign_urn}
 Authorization: Bearer {access_token}
 Linkedin-Version: 202510
 ```
@@ -528,7 +528,7 @@ Linkedin-Version: 202510
 #### Update Campaign
 
 ```http
-POST /rest/adCampaigns/{campaign_urn}
+POST /linkedin/rest/adCampaigns/{campaign_urn}
 Authorization: Bearer {access_token}
 Linkedin-Version: 202510
 Content-Type: application/json
@@ -567,7 +567,7 @@ Content-Type: application/json
 
 ## TikTok Marketing API
 
-**Base URL**: `/open_api/v1.3`
+**Base URL**: `/tiktok/v1.3`
 **Authentication**: OAuth 2.0 v2
 **Token Expiration**: Access token (86400s), Refresh token (31536000s)
 
@@ -576,7 +576,7 @@ Content-Type: application/json
 #### 1. Get Authorization Code
 
 ```http
-GET /oauth/authorize
+GET /google/oauth/authorize
 ```
 
 **Query Parameters:**
@@ -590,13 +590,13 @@ GET /oauth/authorize
 
 **Example Request:**
 ```bash
-curl "http://localhost:3000/oauth/authorize?client_key=mock_tiktok_client_key_567890&response_type=code&scope=ad_management&redirect_uri=http://localhost/callback"
+curl "http://localhost:3000/google/oauth/authorize?client_key=mock_tiktok_client_key_567890&response_type=code&scope=ad_management&redirect_uri=http://localhost/callback"
 ```
 
 #### 2. Get Access Token
 
 ```http
-POST /v2/oauth/token/
+POST /tiktok/v2/oauth/token/
 Content-Type: application/x-www-form-urlencoded
 ```
 
@@ -654,7 +654,7 @@ Error responses:
 #### Create Campaign
 
 ```http
-POST /open_api/v1.3/campaign/create/
+POST /tiktok/v1.3/campaign/create/
 Authorization: Bearer {access_token}
 Content-Type: application/json
 ```
@@ -691,7 +691,7 @@ Content-Type: application/json
 #### Update Campaign
 
 ```http
-POST /open_api/v1.3/campaign/update/
+POST /tiktok/v1.3/campaign/update/
 Authorization: Bearer {access_token}
 Content-Type: application/json
 ```
@@ -712,7 +712,7 @@ Content-Type: application/json
 #### Get Campaign
 
 ```http
-GET /open_api/v1.3/campaign/get/
+GET /tiktok/v1.3/campaign/get/
 Authorization: Bearer {access_token}
 ```
 
@@ -761,7 +761,7 @@ curl "http://localhost:3000/open_api/v1.3/campaign/get/?advertiser_id=123456&cam
 
 ## The Trade Desk API v3
 
-**Base URL**: `/v3`
+**Base URL**: `/ttd/v3`
 **Authentication**: Token-based (NOT OAuth)
 **Special Header**: `TTD-Auth` (NOT Authorization)
 
@@ -770,7 +770,7 @@ curl "http://localhost:3000/open_api/v1.3/campaign/get/?advertiser_id=123456&cam
 #### Get Authentication Token
 
 ```http
-POST /v3/authentication
+POST /ttd/v3/authentication
 Content-Type: application/json
 ```
 
@@ -804,7 +804,7 @@ Content-Type: application/json
 #### Create Campaign
 
 ```http
-POST /v3/campaign
+POST /ttd/v3/campaign
 TTD-Auth: {token}
 Content-Type: application/json
 ```
@@ -843,7 +843,7 @@ Content-Type: application/json
 #### Update Campaign
 
 ```http
-PUT /v3/campaign/{campaign_id}
+PUT /ttd/v3/campaign/{campaign_id}
 TTD-Auth: {token}
 Content-Type: application/json
 ```
@@ -866,7 +866,7 @@ Content-Type: application/json
 #### Get Campaign
 
 ```http
-GET /v3/campaign/{campaign_id}
+GET /ttd/v3/campaign/{campaign_id}
 TTD-Auth: {token}
 ```
 
@@ -906,7 +906,7 @@ TTD-Auth: {token}
 
 ## DV360 API v4
 
-**Base URL**: `/v4`
+**Base URL**: `/dv360/v4`
 **Authentication**: OAuth 2.0 (Shares Google OAuth)
 **API Version**: v4 (March 2025)
 **Required Scope**: `https://www.googleapis.com/auth/doubleclickbidmanager`
@@ -922,7 +922,7 @@ Uses the same OAuth flow as Google Ads (see Google Ads Authentication section).
 #### Create Campaign
 
 ```http
-POST /v4/advertisers/{advertiserId}/campaigns
+POST /dv360/v4/advertisers/{advertiserId}/campaigns
 Authorization: Bearer {access_token}
 Content-Type: application/json
 ```
@@ -987,7 +987,7 @@ Content-Type: application/json
 #### Update Campaign
 
 ```http
-PATCH /v4/advertisers/{advertiserId}/campaigns/{campaignId}
+PATCH /dv360/v4/advertisers/{advertiserId}/campaigns/{campaignId}
 Authorization: Bearer {access_token}
 Content-Type: application/json
 ```
@@ -1002,7 +1002,7 @@ Content-Type: application/json
 #### Get Campaign
 
 ```http
-GET /v4/advertisers/{advertiserId}/campaigns/{campaignId}
+GET /dv360/v4/advertisers/{advertiserId}/campaigns/{campaignId}
 Authorization: Bearer {access_token}
 ```
 
