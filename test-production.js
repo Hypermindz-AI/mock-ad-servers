@@ -171,10 +171,10 @@ async function runTests() {
     }
   })) { passed++; } else { failed++; }
 
-  // Test Meta Campaign Insights
+  // Test Meta Campaign Insights (using default campaign ID)
   if (await testEndpoint('Meta - Get Campaign Insights', {
     method: 'GET',
-    url: `${BASE_URL}/meta/v23.0/120210000000001/insights?date_preset=last_7d`,
+    url: `${BASE_URL}/meta/v23.0/120210000000000000/insights?date_preset=last_7d`,
     headers: {
       'Authorization': `Bearer ${VALID_TOKENS.meta}`
     }
@@ -186,7 +186,7 @@ async function runTests() {
     url: `${BASE_URL}/googleads/v21/customers/1234567890/googleAds:search`,
     headers: {
       'Authorization': `Bearer ${VALID_TOKENS.googleAds}`,
-      'developer-token': 'mock_developer_token',
+      'developer-token': 'mock_google_dev_token_67890',
       'Content-Type': 'application/json'
     },
     data: {
