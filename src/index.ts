@@ -108,6 +108,7 @@ app.get('/api-docs/swagger.json', (_req, res) => {
 
 // Serve Swagger UI using CDN for serverless compatibility
 app.get('/api-docs', (_req, res) => {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.send(`
     <!DOCTYPE html>
     <html lang="en">
@@ -115,31 +116,44 @@ app.get('/api-docs', (_req, res) => {
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Mock Ad Servers API Documentation</title>
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.10.5/swagger-ui.css" />
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.10.5/swagger-ui.css" crossorigin="anonymous" />
       <style>
         body { margin: 0; }
         .swagger-ui .topbar { display: none; }
+        #loading { padding: 20px; font-family: sans-serif; }
       </style>
     </head>
     <body>
+      <div id="loading">Loading Swagger UI...</div>
       <div id="swagger-ui"></div>
-      <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.10.5/swagger-ui-bundle.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.10.5/swagger-ui-standalone-preset.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.10.5/swagger-ui-bundle.js" crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.10.5/swagger-ui-standalone-preset.js" crossorigin="anonymous"></script>
       <script>
         window.onload = () => {
-          window.ui = SwaggerUIBundle({
-            url: '/api-docs/swagger.json',
-            dom_id: '#swagger-ui',
-            deepLinking: true,
-            presets: [
-              SwaggerUIBundle.presets.apis,
-              SwaggerUIStandalonePreset
-            ],
-            plugins: [
-              SwaggerUIBundle.plugins.DownloadUrl
-            ],
-            layout: "StandaloneLayout"
-          });
+          try {
+            if (typeof SwaggerUIBundle === 'undefined') {
+              document.getElementById('loading').innerHTML = 'Error: Swagger UI failed to load. Please check your internet connection and try again.';
+              console.error('SwaggerUIBundle not loaded');
+              return;
+            }
+            document.getElementById('loading').style.display = 'none';
+            window.ui = SwaggerUIBundle({
+              url: '/api-docs/swagger.json',
+              dom_id: '#swagger-ui',
+              deepLinking: true,
+              presets: [
+                SwaggerUIBundle.presets.apis,
+                SwaggerUIStandalonePreset
+              ],
+              plugins: [
+                SwaggerUIBundle.plugins.DownloadUrl
+              ],
+              layout: "StandaloneLayout"
+            });
+          } catch (error) {
+            document.getElementById('loading').innerHTML = 'Error initializing Swagger UI: ' + error.message;
+            console.error('Error initializing Swagger UI:', error);
+          }
         };
       </script>
     </body>
