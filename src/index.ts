@@ -3,9 +3,12 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import swaggerUi from 'swagger-ui-express';
+import swaggerJsdoc from 'swagger-jsdoc';
 import { serverConfig } from './config/auth.config.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { requestLogger, rateLimitSimulator } from './middleware/logger.js';
+import { swaggerOptions } from './config/swagger.js';
 
 // Import OAuth/Auth routes
 import googleOAuthRouter from './auth/google-oauth.js';
@@ -28,7 +31,17 @@ dotenv.config();
 const app: Application = express();
 
 // Security middleware
-app.use(helmet());
+// Configure helmet to allow Swagger UI to load inline scripts
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", 'data:', 'https:'],
+    },
+  },
+}));
 app.use(cors());
 
 // Request parsing middleware
@@ -76,9 +89,20 @@ app.get('/', (_req, res) => {
       { platform: 'TikTok', baseUrl: '/tiktok/oauth' },
       { platform: 'The Trade Desk', baseUrl: '/ttd/v3/authentication (Token-based)' },
     ],
-    documentation: '/IMPLEMENTATION_PLAN.md',
+    documentation: '/api-docs',
   });
 });
+
+// ============================================
+// Swagger API Documentation
+// ============================================
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Mock Ad Servers API Documentation',
+}));
 
 // ============================================
 // OAuth/Authentication Routes
@@ -143,7 +167,8 @@ if (require.main === module) {
     console.log(`Environment: ${serverConfig.nodeEnv}`);
     console.log(`Server running on: http://localhost:${PORT}`);
     console.log(`Health check: http://localhost:${PORT}/health`);
-    console.log(`API docs: http://localhost:${PORT}/`);
+    console.log(`📚 Swagger UI: http://localhost:${PORT}/api-docs`);
+    console.log(`API overview: http://localhost:${PORT}/`);
     console.log('===========================================');
     console.log('\n📋 Available Platforms:');
     console.log('  • Google Ads API v21');
