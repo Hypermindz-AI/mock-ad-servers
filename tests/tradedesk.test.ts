@@ -113,7 +113,7 @@ describe('The Trade Desk API v3', () => {
 
     it('should return 401 with both invalid credentials', async () => {
       const response = await request(app)
-        .post('/v3/authentication')
+        .post('/ttd/v3/authentication')
         .send({
           Login: 'invalid_username',
           Password: 'invalid_password',
@@ -126,7 +126,7 @@ describe('The Trade Desk API v3', () => {
 
     it('should return token expiration in ISO 8601 format', async () => {
       const response = await request(app)
-        .post('/v3/authentication')
+        .post('/ttd/v3/authentication')
         .send({
           Login: TTD_USERNAME,
           Password: TTD_PASSWORD,
@@ -161,7 +161,7 @@ describe('The Trade Desk API v3', () => {
 
     it('should create campaign successfully with valid data (PascalCase format)', async () => {
       const response = await request(app)
-        .post('/v3/campaign')
+        .post('/ttd/v3/campaign')
         .set('TTD-Auth', TTD_VALID_TOKEN)
         .send(validCampaignData)
         .expect(200);
@@ -188,7 +188,7 @@ describe('The Trade Desk API v3', () => {
       };
 
       const response = await request(app)
-        .post('/v3/campaign')
+        .post('/ttd/v3/campaign')
         .set('TTD-Auth', TTD_VALID_TOKEN)
         .send(invalidData)
         .expect(400);
@@ -210,7 +210,7 @@ describe('The Trade Desk API v3', () => {
       };
 
       const response = await request(app)
-        .post('/v3/campaign')
+        .post('/ttd/v3/campaign')
         .set('TTD-Auth', TTD_VALID_TOKEN)
         .send(invalidData)
         .expect(400);
@@ -229,7 +229,7 @@ describe('The Trade Desk API v3', () => {
       };
 
       const response = await request(app)
-        .post('/v3/campaign')
+        .post('/ttd/v3/campaign')
         .set('TTD-Auth', TTD_VALID_TOKEN)
         .send(invalidData)
         .expect(400);
@@ -251,7 +251,7 @@ describe('The Trade Desk API v3', () => {
       };
 
       const response = await request(app)
-        .post('/v3/campaign')
+        .post('/ttd/v3/campaign')
         .set('TTD-Auth', TTD_VALID_TOKEN)
         .send(invalidData)
         .expect(400);
@@ -272,7 +272,7 @@ describe('The Trade Desk API v3', () => {
       };
 
       const response = await request(app)
-        .post('/v3/campaign')
+        .post('/ttd/v3/campaign')
         .set('TTD-Auth', TTD_VALID_TOKEN)
         .send(invalidData)
         .expect(400);
@@ -293,7 +293,7 @@ describe('The Trade Desk API v3', () => {
       };
 
       const response = await request(app)
-        .post('/v3/campaign')
+        .post('/ttd/v3/campaign')
         .set('TTD-Auth', TTD_VALID_TOKEN)
         .send(invalidData)
         .expect(400);
@@ -316,7 +316,7 @@ describe('The Trade Desk API v3', () => {
       };
 
       const response = await request(app)
-        .post('/v3/campaign')
+        .post('/ttd/v3/campaign')
         .set('TTD-Auth', TTD_VALID_TOKEN)
         .send(invalidData)
         .expect(400);
@@ -334,7 +334,7 @@ describe('The Trade Desk API v3', () => {
       };
 
       const response = await request(app)
-        .post('/v3/campaign')
+        .post('/ttd/v3/campaign')
         .set('TTD-Auth', TTD_VALID_TOKEN)
         .send(invalidData)
         .expect(400);
@@ -352,7 +352,7 @@ describe('The Trade Desk API v3', () => {
       };
 
       const response = await request(app)
-        .post('/v3/campaign')
+        .post('/ttd/v3/campaign')
         .set('TTD-Auth', TTD_VALID_TOKEN)
         .send(invalidData)
         .expect(400);
@@ -370,7 +370,7 @@ describe('The Trade Desk API v3', () => {
       };
 
       const response = await request(app)
-        .post('/v3/campaign')
+        .post('/ttd/v3/campaign')
         .set('TTD-Auth', TTD_VALID_TOKEN)
         .send(dataWithOffset)
         .expect(200);
@@ -386,7 +386,7 @@ describe('The Trade Desk API v3', () => {
       };
 
       const response = await request(app)
-        .post('/v3/campaign')
+        .post('/ttd/v3/campaign')
         .set('TTD-Auth', TTD_VALID_TOKEN)
         .send(dataWithOffset)
         .expect(200);
@@ -411,7 +411,7 @@ describe('The Trade Desk API v3', () => {
       };
 
       const response = await request(app)
-        .put(`/v3/campaign/${campaignId}`)
+        .put(`/ttd/v3/campaign/${campaignId}`)
         .set('TTD-Auth', TTD_VALID_TOKEN)
         .send(updateData)
         .expect(200);
@@ -433,7 +433,7 @@ describe('The Trade Desk API v3', () => {
       };
 
       const response = await request(app)
-        .put(`/v3/campaign/${campaignId}`)
+        .put(`/ttd/v3/campaign/${campaignId}`)
         .set('TTD-Auth', TTD_VALID_TOKEN)
         .send(updateData)
         .expect(200);
@@ -448,7 +448,7 @@ describe('The Trade Desk API v3', () => {
       };
 
       const response = await request(app)
-        .put(`/v3/campaign/${campaignId}`)
+        .put(`/ttd/v3/campaign/${campaignId}`)
         .set('TTD-Auth', TTD_VALID_TOKEN)
         .send(updateData)
         .expect(200);
@@ -463,7 +463,7 @@ describe('The Trade Desk API v3', () => {
       };
 
       const response = await request(app)
-        .put(`/v3/campaign/${campaignId}`)
+        .put(`/ttd/v3/campaign/${campaignId}`)
         .set('TTD-Auth', TTD_VALID_TOKEN)
         .send(updateData)
         .expect(400);
@@ -476,7 +476,7 @@ describe('The Trade Desk API v3', () => {
 
     it('should accept valid Availability value: Active', async () => {
       const response = await request(app)
-        .put(`/v3/campaign/${campaignId}`)
+        .put(`/ttd/v3/campaign/${campaignId}`)
         .set('TTD-Auth', TTD_VALID_TOKEN)
         .send({ Availability: 'Active' })
         .expect(200);
@@ -486,7 +486,7 @@ describe('The Trade Desk API v3', () => {
 
     it('should accept valid Availability value: Paused', async () => {
       const response = await request(app)
-        .put(`/v3/campaign/${campaignId}`)
+        .put(`/ttd/v3/campaign/${campaignId}`)
         .set('TTD-Auth', TTD_VALID_TOKEN)
         .send({ Availability: 'Paused' })
         .expect(200);
@@ -496,7 +496,7 @@ describe('The Trade Desk API v3', () => {
 
     it('should accept valid Availability value: Archived', async () => {
       const response = await request(app)
-        .put(`/v3/campaign/${campaignId}`)
+        .put(`/ttd/v3/campaign/${campaignId}`)
         .set('TTD-Auth', TTD_VALID_TOKEN)
         .send({ Availability: 'Archived' })
         .expect(200);
@@ -513,7 +513,7 @@ describe('The Trade Desk API v3', () => {
       };
 
       const response = await request(app)
-        .put(`/v3/campaign/${campaignId}`)
+        .put(`/ttd/v3/campaign/${campaignId}`)
         .set('TTD-Auth', TTD_VALID_TOKEN)
         .send(updateData)
         .expect(400);
@@ -533,7 +533,7 @@ describe('The Trade Desk API v3', () => {
       };
 
       const response = await request(app)
-        .put(`/v3/campaign/${campaignId}`)
+        .put(`/ttd/v3/campaign/${campaignId}`)
         .set('TTD-Auth', TTD_VALID_TOKEN)
         .send(updateData)
         .expect(400);
@@ -553,7 +553,7 @@ describe('The Trade Desk API v3', () => {
       };
 
       const response = await request(app)
-        .put(`/v3/campaign/${campaignId}`)
+        .put(`/ttd/v3/campaign/${campaignId}`)
         .set('TTD-Auth', TTD_VALID_TOKEN)
         .send(updateData)
         .expect(200);
@@ -572,7 +572,7 @@ describe('The Trade Desk API v3', () => {
       const campaignId = 'ttd_campaign_67890';
 
       const response = await request(app)
-        .get(`/v3/campaign/${campaignId}`)
+        .get(`/ttd/v3/campaign/${campaignId}`)
         .set('TTD-Auth', TTD_VALID_TOKEN)
         .expect(200);
 
@@ -596,7 +596,7 @@ describe('The Trade Desk API v3', () => {
       const campaignId = 'test_campaign_123';
 
       const response = await request(app)
-        .get(`/v3/campaign/${campaignId}`)
+        .get(`/ttd/v3/campaign/${campaignId}`)
         .set('TTD-Auth', TTD_VALID_TOKEN)
         .expect(200);
 
@@ -612,12 +612,12 @@ describe('The Trade Desk API v3', () => {
       const campaignId2 = 'campaign_002';
 
       const response1 = await request(app)
-        .get(`/v3/campaign/${campaignId1}`)
+        .get(`/ttd/v3/campaign/${campaignId1}`)
         .set('TTD-Auth', TTD_VALID_TOKEN)
         .expect(200);
 
       const response2 = await request(app)
-        .get(`/v3/campaign/${campaignId2}`)
+        .get(`/ttd/v3/campaign/${campaignId2}`)
         .set('TTD-Auth', TTD_VALID_TOKEN)
         .expect(200);
 

@@ -971,7 +971,7 @@ describe('TikTok Marketing API', () => {
 
     it('should handle campaign with very large budget', async () => {
       const response = await request(app)
-        .post('/open_api/v1.3/campaign/create/')
+        .post('/tiktok/v1.3/campaign/create/')
         .set('Authorization', `Bearer ${VALID_TOKEN}`)
         .send({
           advertiser_id: '123456',
@@ -993,7 +993,7 @@ describe('TikTok Marketing API', () => {
 
     it('should handle campaign with minimum budget', async () => {
       const response = await request(app)
-        .post('/open_api/v1.3/campaign/create/')
+        .post('/tiktok/v1.3/campaign/create/')
         .set('Authorization', `Bearer ${VALID_TOKEN}`)
         .send({
           advertiser_id: '123456',

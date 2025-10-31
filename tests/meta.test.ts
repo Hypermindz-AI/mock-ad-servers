@@ -737,7 +737,7 @@ describe('Meta Marketing API v23.0', () => {
         };
 
         const response = await request(app)
-          .post(`/v23.0/${nonExistentCampaignId}`)
+          .post(`/meta/v23.0/${nonExistentCampaignId}`)
           .set('Authorization', `Bearer ${VALID_TOKEN}`)
           .send(updateData);
 
