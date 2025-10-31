@@ -30,14 +30,16 @@ dotenv.config();
 const app: Application = express();
 
 // Security middleware
-// Configure helmet to allow Swagger UI to load inline scripts
+// Configure helmet to allow Swagger UI to load from CDN
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'", 'https://cdn.jsdelivr.net'],
+      scriptSrc: ["'self'", "'unsafe-inline'", 'https://cdn.jsdelivr.net'],
       imgSrc: ["'self'", 'data:', 'https:'],
+      fontSrc: ["'self'", 'https:', 'data:'],
+      connectSrc: ["'self'"],
     },
   },
 }));
