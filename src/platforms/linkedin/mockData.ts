@@ -175,3 +175,236 @@ export const isValidCampaignUrn = (urn: string): boolean => {
 
 // Initialize with sample campaign
 campaignStore.set(sampleCampaign.id, sampleCampaign);
+
+// ============================================
+// Campaign Groups (LinkedIn 202510)
+// ============================================
+
+export interface LinkedInCampaignGroup {
+  id: string;
+  account: string;
+  name: string;
+  status: string;
+  runSchedule?: {
+    start: number;
+    end?: number;
+  };
+  totalBudget?: {
+    amount: string;
+    currencyCode: string;
+  };
+  createdAt?: number;
+  lastModifiedAt?: number;
+}
+
+// In-memory storage for campaign groups
+export const campaignGroupStore: Map<string, LinkedInCampaignGroup> = new Map();
+
+// Helper function to generate campaign group URN
+export const generateCampaignGroupUrn = (): string => {
+  const id = Math.floor(100000 + Math.random() * 900000);
+  return `urn:li:sponsoredCampaignGroup:${id}`;
+};
+
+// Helper function to validate campaign group URN format
+export const isValidCampaignGroupUrn = (urn: string): boolean => {
+  return /^urn:li:sponsoredCampaignGroup:\d+$/.test(urn);
+};
+
+// Sample campaign group
+export const sampleCampaignGroup: LinkedInCampaignGroup = {
+  id: 'urn:li:sponsoredCampaignGroup:111111',
+  account: 'urn:li:sponsoredAccount:123',
+  name: 'Q4 Marketing Campaign Group',
+  status: 'ACTIVE',
+  runSchedule: {
+    start: Date.now() - 86400000,
+    end: Date.now() + 2592000000
+  },
+  totalBudget: {
+    amount: '50000',
+    currencyCode: 'USD'
+  },
+  createdAt: Date.now() - 172800000,
+  lastModifiedAt: Date.now()
+};
+
+// Initialize with sample campaign group
+campaignGroupStore.set(sampleCampaignGroup.id, sampleCampaignGroup);
+
+// ============================================
+// Creatives (LinkedIn 202510)
+// ============================================
+
+export interface LinkedInCreative {
+  id: string;
+  campaign: string;
+  status: string;
+  type: string;
+  content?: {
+    title?: string;
+    description?: string;
+    landingPageUrl?: string;
+    imageUrl?: string;
+  };
+  createdAt?: number;
+  lastModifiedAt?: number;
+}
+
+// In-memory storage for creatives
+export const creativeStore: Map<string, LinkedInCreative> = new Map();
+
+// Helper function to generate creative URN
+export const generateCreativeUrn = (): string => {
+  const id = Math.floor(100000 + Math.random() * 900000);
+  return `urn:li:sponsoredCreative:${id}`;
+};
+
+// Helper function to validate creative URN format
+export const isValidCreativeUrn = (urn: string): boolean => {
+  return /^urn:li:sponsoredCreative:\d+$/.test(urn);
+};
+
+// Valid creative types
+export const VALID_CREATIVE_TYPES = ['SINGLE_IMAGE', 'VIDEO', 'CAROUSEL', 'TEXT'];
+
+// Sample creative
+export const sampleCreative: LinkedInCreative = {
+  id: 'urn:li:sponsoredCreative:222222',
+  campaign: sampleCampaign.id,
+  status: 'ACTIVE',
+  type: 'SINGLE_IMAGE',
+  content: {
+    title: 'Engage with Our Brand',
+    description: 'Discover innovative solutions for your business',
+    landingPageUrl: 'https://example.com/landing',
+    imageUrl: 'https://example.com/images/ad-creative.jpg'
+  },
+  createdAt: Date.now() - 86400000,
+  lastModifiedAt: Date.now()
+};
+
+// Initialize with sample creative
+creativeStore.set(sampleCreative.id, sampleCreative);
+
+// ============================================
+// Analytics Data (LinkedIn 202510)
+// ============================================
+
+export interface LinkedInAnalyticsData {
+  campaignId: string;
+  dateRange: {
+    start: string;
+    end: string;
+  };
+  impressions: number;
+  clicks: number;
+  costInLocalCurrency: string;
+  conversions: number;
+  externalWebsiteConversions?: number;
+  landingPageClicks?: number;
+  videoViews?: number;
+  engagements?: number;
+}
+
+// Helper function to generate mock analytics data
+export const generateAnalyticsData = (
+  campaignId: string,
+  dateRange: { start: string; end: string }
+): LinkedInAnalyticsData => {
+  const impressions = Math.floor(1000 + Math.random() * 9000);
+  const clicks = Math.floor(impressions * (0.01 + Math.random() * 0.05));
+  const conversions = Math.floor(clicks * (0.05 + Math.random() * 0.15));
+  const cost = (clicks * (2 + Math.random() * 8)).toFixed(2);
+
+  return {
+    campaignId,
+    dateRange,
+    impressions,
+    clicks,
+    costInLocalCurrency: cost,
+    conversions,
+    externalWebsiteConversions: Math.floor(conversions * 0.7),
+    landingPageClicks: Math.floor(clicks * 0.9),
+    videoViews: Math.floor(impressions * 0.3),
+    engagements: Math.floor(impressions * 0.02)
+  };
+};
+
+// ============================================
+// Pagination Helper
+// ============================================
+
+export interface PaginationParams {
+  start?: number;
+  count?: number;
+}
+
+export interface PaginatedResponse<T> {
+  elements: T[];
+  paging: {
+    start: number;
+    count: number;
+    total: number;
+  };
+}
+
+export const paginateResults = <T>(
+  items: T[],
+  params: PaginationParams
+): PaginatedResponse<T> => {
+  const start = params.start || 0;
+  const count = params.count || 10;
+  const total = items.length;
+
+  const elements = items.slice(start, start + count);
+
+  return {
+    elements,
+    paging: {
+      start,
+      count: elements.length,
+      total
+    }
+  };
+};
+
+// ============================================
+// Error Responses for New Endpoints
+// ============================================
+
+export const campaignGroupNotFoundError = {
+  serviceErrorCode: 404,
+  message: 'Campaign group not found',
+  status: 404
+};
+
+export const creativeNotFoundError = {
+  serviceErrorCode: 404,
+  message: 'Creative not found',
+  status: 404
+};
+
+export const invalidDateRangeError = {
+  status: 400,
+  code: 'INVALID_REQUEST',
+  message: 'Invalid date range',
+  details: [
+    {
+      field: 'dateRange',
+      message: 'Start date must be before end date'
+    }
+  ]
+};
+
+export const invalidCreativeTypeError = {
+  status: 400,
+  code: 'INVALID_REQUEST',
+  message: 'Invalid creative type',
+  details: [
+    {
+      field: 'type',
+      message: 'Creative type must be one of: SINGLE_IMAGE, VIDEO, CAROUSEL, TEXT'
+    }
+  ]
+};

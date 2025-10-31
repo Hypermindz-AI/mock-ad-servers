@@ -191,3 +191,166 @@ export const generateFbTraceId = (): string => {
   }
   return result;
 };
+
+/**
+ * Ad Set Interface
+ */
+export interface MetaAdSet {
+  id: string;
+  name: string;
+  campaign_id: string;
+  status: string;
+  billing_event?: string;
+  optimization_goal?: string;
+  bid_amount?: number;
+  daily_budget?: number;
+  lifetime_budget?: number;
+  targeting?: any;
+  created_time?: string;
+  updated_time?: string;
+}
+
+/**
+ * Ad Interface
+ */
+export interface MetaAd {
+  id: string;
+  name: string;
+  adset_id: string;
+  campaign_id: string;
+  status: string;
+  creative?: any;
+  created_time?: string;
+  updated_time?: string;
+}
+
+/**
+ * Campaign Insights Interface
+ */
+export interface MetaCampaignInsights {
+  impressions: string;
+  clicks: string;
+  spend: string;
+  cpc: string;
+  cpm: string;
+  ctr: string;
+  date_start?: string;
+  date_stop?: string;
+}
+
+/**
+ * Pagination Response
+ */
+export interface MetaPaginationResponse<T> {
+  data: T[];
+  paging?: {
+    cursors: {
+      before: string;
+      after: string;
+    };
+    next?: string;
+  };
+}
+
+/**
+ * In-memory ad set storage
+ */
+export const adSetStorage: Map<string, MetaAdSet> = new Map();
+
+/**
+ * In-memory ad storage
+ */
+export const adStorage: Map<string, MetaAd> = new Map();
+
+/**
+ * Helper function to generate unique ad set ID
+ */
+export const generateAdSetId = (): string => {
+  return `2301100000${Date.now().toString().slice(-8)}`;
+};
+
+/**
+ * Helper function to generate unique ad ID
+ */
+export const generateAdId = (): string => {
+  return `2302100000${Date.now().toString().slice(-8)}`;
+};
+
+/**
+ * Helper function to generate cursor for pagination
+ */
+export const generateCursor = (): string => {
+  return Buffer.from(Date.now().toString() + Math.random().toString()).toString('base64');
+};
+
+/**
+ * Valid billing events for ad sets
+ */
+export const validBillingEvents = [
+  'IMPRESSIONS',
+  'CLICKS',
+  'LINK_CLICKS',
+  'POST_ENGAGEMENT',
+  'APP_INSTALLS',
+  'VIDEO_VIEWS',
+  'THRUPLAY',
+];
+
+/**
+ * Valid optimization goals for ad sets
+ */
+export const validOptimizationGoals = [
+  'REACH',
+  'LINK_CLICKS',
+  'IMPRESSIONS',
+  'OFFSITE_CONVERSIONS',
+  'CONVERSIONS',
+  'APP_INSTALLS',
+  'ENGAGEMENT',
+  'LEAD_GENERATION',
+  'QUALITY_CALL',
+  'THRUPLAY',
+  'AD_RECALL_LIFT',
+  'VALUE',
+  'LANDING_PAGE_VIEWS',
+];
+
+/**
+ * Sample insights data generator
+ */
+export const generateInsightsData = (
+  datePreset?: string,
+  timeRange?: { since: string; until: string }
+): MetaCampaignInsights => {
+  const impressions = Math.floor(Math.random() * 50000) + 10000;
+  const clicks = Math.floor(impressions * (Math.random() * 0.05 + 0.01));
+  const spend = (Math.random() * 5000 + 1000).toFixed(2);
+  const cpc = (parseFloat(spend) / clicks).toFixed(2);
+  const cpm = ((parseFloat(spend) / impressions) * 1000).toFixed(2);
+  const ctr = ((clicks / impressions) * 100).toFixed(2);
+
+  let dateStart: string;
+  let dateStop: string;
+
+  if (timeRange) {
+    dateStart = timeRange.since;
+    dateStop = timeRange.until;
+  } else {
+    const now = new Date();
+    const daysAgo = datePreset === 'last_30d' ? 30 : datePreset === 'last_7d' ? 7 : 365;
+    const startDate = new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000);
+    dateStart = startDate.toISOString().split('T')[0];
+    dateStop = now.toISOString().split('T')[0];
+  }
+
+  return {
+    impressions: impressions.toString(),
+    clicks: clicks.toString(),
+    spend,
+    cpc,
+    cpm,
+    ctr,
+    date_start: dateStart,
+    date_stop: dateStop,
+  };
+};

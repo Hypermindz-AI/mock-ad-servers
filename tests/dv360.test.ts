@@ -902,4 +902,487 @@ describe('DV360 API v4 Tests', () => {
       expect(getResponse.body.name).toBe(expectedResourceName);
     });
   });
+
+  // ============================================
+  // Campaign List Tests
+  // ============================================
+  describe('Campaign List Tests', () => {
+    describe('GET /v4/advertisers/:advertiserId/campaigns - list campaigns', () => {
+      it('should list campaigns successfully', async () => {
+        const response = await request(app)
+          .get(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
+          .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty('campaigns');
+        expect(Array.isArray(response.body.campaigns)).toBe(true);
+        expect(response.body.campaigns.length).toBeGreaterThan(0);
+      });
+
+      it('should support pageSize parameter', async () => {
+        const response = await request(app)
+          .get(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
+          .query({ pageSize: 5 })
+          .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`);
+
+        expect(response.status).toBe(200);
+        expect(response.body.campaigns.length).toBeLessThanOrEqual(5);
+      });
+
+      it('should support filter parameter', async () => {
+        const response = await request(app)
+          .get(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
+          .query({ filter: 'entityStatus="ENTITY_STATUS_ACTIVE"' })
+          .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty('campaigns');
+      });
+
+      it('should support orderBy parameter', async () => {
+        const response = await request(app)
+          .get(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns`)
+          .query({ orderBy: 'displayName' })
+          .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty('campaigns');
+      });
+    });
+  });
+
+  // ============================================
+  // Campaign Query Tests
+  // ============================================
+  describe('Campaign Query Tests', () => {
+    describe('POST /v4/advertisers/:advertiserId/campaigns:query - query metrics', () => {
+      it('should query campaign metrics successfully', async () => {
+        const queryData = {
+          metrics: ['METRIC_IMPRESSIONS', 'METRIC_CLICKS', 'METRIC_TOTAL_COST'],
+          dateRanges: [
+            {
+              startDate: { year: 2025, month: 11, day: 1 },
+              endDate: { year: 2025, month: 11, day: 30 },
+            },
+          ],
+        };
+
+        const response = await request(app)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns:query`)
+          .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
+          .send(queryData);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty('campaignMetrics');
+        expect(Array.isArray(response.body.campaignMetrics)).toBe(true);
+        expect(response.body.campaignMetrics.length).toBeGreaterThan(0);
+        expect(response.body.campaignMetrics[0]).toHaveProperty('campaignId');
+        expect(response.body.campaignMetrics[0]).toHaveProperty('metrics');
+      });
+
+      it('should return error for invalid metrics', async () => {
+        const queryData = {
+          metrics: ['INVALID_METRIC'],
+          dateRanges: [
+            {
+              startDate: { year: 2025, month: 11, day: 1 },
+              endDate: { year: 2025, month: 11, day: 30 },
+            },
+          ],
+        };
+
+        const response = await request(app)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns:query`)
+          .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
+          .send(queryData);
+
+        expect(response.status).toBe(400);
+        expect(response.body).toHaveProperty('error');
+        expect(response.body.error.code).toBe(400);
+      });
+
+      it('should query without dateRanges', async () => {
+        const queryData = {
+          metrics: ['METRIC_IMPRESSIONS', 'METRIC_CLICKS'],
+        };
+
+        const response = await request(app)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/campaigns:query`)
+          .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
+          .send(queryData);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty('campaignMetrics');
+      });
+    });
+  });
+
+  // ============================================
+  // Insertion Order Tests
+  // ============================================
+  describe('Insertion Order Tests', () => {
+    describe('POST /v4/advertisers/:advertiserId/insertionOrders - create insertion order', () => {
+      it('should create insertion order successfully', async () => {
+        const ioData = {
+          displayName: 'Test Insertion Order',
+          campaignId: '111222333',
+          insertionOrderType: 'RTB',
+          entityStatus: 'ENTITY_STATUS_DRAFT',
+          pacing: {
+            pacingPeriod: 'PACING_PERIOD_DAILY',
+            pacingType: 'PACING_TYPE_EVEN',
+          },
+          budget: {
+            budgetUnit: 'BUDGET_UNIT_CURRENCY',
+            budgetSegments: [
+              {
+                budgetAmountMicros: '100000000000',
+                dateRange: {
+                  startDate: { year: 2025, month: 11, day: 1 },
+                  endDate: { year: 2025, month: 12, day: 31 },
+                },
+              },
+            ],
+          },
+        };
+
+        const response = await request(app)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/insertionOrders`)
+          .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
+          .send(ioData);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty('name');
+        expect(response.body.name).toMatch(/^advertisers\/\d+\/insertionOrders\/\d+$/);
+        expect(response.body).toHaveProperty('insertionOrderId');
+        expect(response.body).toHaveProperty('displayName', 'Test Insertion Order');
+        expect(response.body).toHaveProperty('campaignId', '111222333');
+        expect(response.body).toHaveProperty('entityStatus', 'ENTITY_STATUS_DRAFT');
+      });
+
+      it('should return error for missing displayName', async () => {
+        const ioData = {
+          campaignId: '111222333',
+        };
+
+        const response = await request(app)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/insertionOrders`)
+          .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
+          .send(ioData);
+
+        expect(response.status).toBe(400);
+        expect(response.body.error.details[0].fieldViolations[0].field).toBe('displayName');
+      });
+
+      it('should return error for missing campaignId', async () => {
+        const ioData = {
+          displayName: 'Test IO',
+        };
+
+        const response = await request(app)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/insertionOrders`)
+          .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
+          .send(ioData);
+
+        expect(response.status).toBe(400);
+        expect(response.body.error.details[0].fieldViolations[0].field).toBe('campaignId');
+      });
+    });
+
+    describe('GET /v4/advertisers/:advertiserId/insertionOrders - list insertion orders', () => {
+      it('should list insertion orders successfully', async () => {
+        const response = await request(app)
+          .get(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/insertionOrders`)
+          .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty('insertionOrders');
+        expect(Array.isArray(response.body.insertionOrders)).toBe(true);
+        expect(response.body.insertionOrders.length).toBeGreaterThan(0);
+      });
+
+      it('should support pageSize parameter', async () => {
+        const response = await request(app)
+          .get(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/insertionOrders`)
+          .query({ pageSize: 5 })
+          .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`);
+
+        expect(response.status).toBe(200);
+        expect(response.body.insertionOrders.length).toBeLessThanOrEqual(5);
+      });
+    });
+
+    describe('GET /v4/advertisers/:advertiserId/insertionOrders/:insertionOrderId - get insertion order', () => {
+      let createdIOId: string;
+
+      beforeEach(async () => {
+        const createResponse = await request(app)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/insertionOrders`)
+          .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
+          .send({
+            displayName: 'IO to Retrieve',
+            campaignId: '111222333',
+          });
+        createdIOId = createResponse.body.insertionOrderId;
+      });
+
+      it('should retrieve insertion order successfully', async () => {
+        const response = await request(app)
+          .get(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/insertionOrders/${createdIOId}`)
+          .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty('insertionOrderId', createdIOId);
+        expect(response.body).toHaveProperty('displayName', 'IO to Retrieve');
+      });
+    });
+
+    describe('PATCH /v4/advertisers/:advertiserId/insertionOrders/:insertionOrderId - update insertion order', () => {
+      let createdIOId: string;
+
+      beforeEach(async () => {
+        const createResponse = await request(app)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/insertionOrders`)
+          .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
+          .send({
+            displayName: 'IO to Update',
+            campaignId: '111222333',
+            entityStatus: 'ENTITY_STATUS_DRAFT',
+          });
+        createdIOId = createResponse.body.insertionOrderId;
+      });
+
+      it('should update insertion order successfully', async () => {
+        const updateData = {
+          displayName: 'Updated IO Name',
+          entityStatus: 'ENTITY_STATUS_ACTIVE',
+        };
+
+        const response = await request(app)
+          .patch(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/insertionOrders/${createdIOId}`)
+          .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
+          .send(updateData);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty('displayName', 'Updated IO Name');
+        expect(response.body).toHaveProperty('entityStatus', 'ENTITY_STATUS_ACTIVE');
+      });
+
+      it('should support updateMask parameter', async () => {
+        const updateData = {
+          displayName: 'Only Name Updated',
+          entityStatus: 'ENTITY_STATUS_ACTIVE',
+        };
+
+        const response = await request(app)
+          .patch(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/insertionOrders/${createdIOId}`)
+          .query({ updateMask: 'displayName' })
+          .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
+          .send(updateData);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty('displayName', 'Only Name Updated');
+        expect(response.body).toHaveProperty('entityStatus', 'ENTITY_STATUS_DRAFT'); // Should not be updated
+      });
+    });
+  });
+
+  // ============================================
+  // Line Item Tests
+  // ============================================
+  describe('Line Item Tests', () => {
+    describe('POST /v4/advertisers/:advertiserId/lineItems - create line item', () => {
+      it('should create line item successfully', async () => {
+        const lineItemData = {
+          displayName: 'Test Line Item',
+          insertionOrderId: '555666777',
+          lineItemType: 'LINE_ITEM_TYPE_DISPLAY_DEFAULT',
+          entityStatus: 'ENTITY_STATUS_DRAFT',
+          flight: {
+            flightDateType: 'LINE_ITEM_FLIGHT_DATE_TYPE_CUSTOM',
+            dateRange: {
+              startDate: { year: 2025, month: 11, day: 1 },
+              endDate: { year: 2025, month: 12, day: 31 },
+            },
+          },
+          budget: {
+            budgetAllocationType: 'LINE_ITEM_BUDGET_ALLOCATION_TYPE_FIXED',
+            maxAmount: '50000000000',
+          },
+          bidStrategy: {
+            fixedBid: {
+              bidAmountMicros: '3000000',
+            },
+          },
+        };
+
+        const response = await request(app)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/lineItems`)
+          .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
+          .send(lineItemData);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty('name');
+        expect(response.body.name).toMatch(/^advertisers\/\d+\/lineItems\/\d+$/);
+        expect(response.body).toHaveProperty('lineItemId');
+        expect(response.body).toHaveProperty('displayName', 'Test Line Item');
+        expect(response.body).toHaveProperty('insertionOrderId', '555666777');
+        expect(response.body).toHaveProperty('entityStatus', 'ENTITY_STATUS_DRAFT');
+      });
+
+      it('should return error for missing displayName', async () => {
+        const lineItemData = {
+          insertionOrderId: '555666777',
+        };
+
+        const response = await request(app)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/lineItems`)
+          .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
+          .send(lineItemData);
+
+        expect(response.status).toBe(400);
+        expect(response.body.error.details[0].fieldViolations[0].field).toBe('displayName');
+      });
+
+      it('should return error for missing insertionOrderId', async () => {
+        const lineItemData = {
+          displayName: 'Test Line Item',
+        };
+
+        const response = await request(app)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/lineItems`)
+          .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
+          .send(lineItemData);
+
+        expect(response.status).toBe(400);
+        expect(response.body.error.details[0].fieldViolations[0].field).toBe('insertionOrderId');
+      });
+    });
+
+    describe('GET /v4/advertisers/:advertiserId/lineItems - list line items', () => {
+      it('should list line items successfully', async () => {
+        const response = await request(app)
+          .get(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/lineItems`)
+          .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty('lineItems');
+        expect(Array.isArray(response.body.lineItems)).toBe(true);
+        expect(response.body.lineItems.length).toBeGreaterThan(0);
+      });
+
+      it('should support pageSize parameter', async () => {
+        const response = await request(app)
+          .get(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/lineItems`)
+          .query({ pageSize: 5 })
+          .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`);
+
+        expect(response.status).toBe(200);
+        expect(response.body.lineItems.length).toBeLessThanOrEqual(5);
+      });
+
+      it('should support filter by insertionOrderId', async () => {
+        const response = await request(app)
+          .get(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/lineItems`)
+          .query({ filter: 'insertionOrderId="555666777"' })
+          .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty('lineItems');
+      });
+    });
+
+    describe('GET /v4/advertisers/:advertiserId/lineItems/:lineItemId - get line item', () => {
+      let createdLineItemId: string;
+
+      beforeEach(async () => {
+        const createResponse = await request(app)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/lineItems`)
+          .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
+          .send({
+            displayName: 'Line Item to Retrieve',
+            insertionOrderId: '555666777',
+          });
+        createdLineItemId = createResponse.body.lineItemId;
+      });
+
+      it('should retrieve line item successfully', async () => {
+        const response = await request(app)
+          .get(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/lineItems/${createdLineItemId}`)
+          .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty('lineItemId', createdLineItemId);
+        expect(response.body).toHaveProperty('displayName', 'Line Item to Retrieve');
+      });
+    });
+
+    describe('PATCH /v4/advertisers/:advertiserId/lineItems/:lineItemId - update line item', () => {
+      let createdLineItemId: string;
+
+      beforeEach(async () => {
+        const createResponse = await request(app)
+          .post(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/lineItems`)
+          .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
+          .send({
+            displayName: 'Line Item to Update',
+            insertionOrderId: '555666777',
+            entityStatus: 'ENTITY_STATUS_DRAFT',
+          });
+        createdLineItemId = createResponse.body.lineItemId;
+      });
+
+      it('should update line item successfully', async () => {
+        const updateData = {
+          displayName: 'Updated Line Item Name',
+          entityStatus: 'ENTITY_STATUS_ACTIVE',
+        };
+
+        const response = await request(app)
+          .patch(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/lineItems/${createdLineItemId}`)
+          .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
+          .send(updateData);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty('displayName', 'Updated Line Item Name');
+        expect(response.body).toHaveProperty('entityStatus', 'ENTITY_STATUS_ACTIVE');
+      });
+
+      it('should support updateMask parameter', async () => {
+        const updateData = {
+          displayName: 'Only Name Updated',
+          entityStatus: 'ENTITY_STATUS_ACTIVE',
+        };
+
+        const response = await request(app)
+          .patch(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/lineItems/${createdLineItemId}`)
+          .query({ updateMask: 'displayName' })
+          .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
+          .send(updateData);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty('displayName', 'Only Name Updated');
+        expect(response.body).toHaveProperty('entityStatus', 'ENTITY_STATUS_DRAFT'); // Should not be updated
+      });
+
+      it('should update bidStrategy', async () => {
+        const updateData = {
+          bidStrategy: {
+            fixedBid: {
+              bidAmountMicros: '5000000',
+            },
+          },
+        };
+
+        const response = await request(app)
+          .patch(`/dv360/v4/advertisers/${TEST_ADVERTISER_ID}/lineItems/${createdLineItemId}`)
+          .set('Authorization', `Bearer ${DV360_VALID_TOKEN}`)
+          .send(updateData);
+
+        expect(response.status).toBe(200);
+        expect(response.body.bidStrategy).toHaveProperty('fixedBid');
+        expect(response.body.bidStrategy.fixedBid.bidAmountMicros).toBe('5000000');
+      });
+    });
+  });
 });

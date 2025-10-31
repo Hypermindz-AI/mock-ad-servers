@@ -233,3 +233,187 @@ export const sampleCampaign: DV360Campaign = {
     timeUnitCount: 7,
   },
 };
+
+// ============================================
+// Insertion Order Interfaces and Mock Data
+// ============================================
+
+export interface DV360InsertionOrder {
+  name: string;
+  insertionOrderId: string;
+  displayName: string;
+  campaignId: string;
+  entityStatus: string;
+  insertionOrderType: string;
+  pacing?: {
+    pacingPeriod: string;
+    pacingType: string;
+    dailyMaxMicros?: string;
+  };
+  frequencyCap?: {
+    maxImpressions?: number;
+    timeUnit?: string;
+    timeUnitCount?: number;
+  };
+  budget?: {
+    budgetUnit: string;
+    budgetSegments?: Array<{
+      budgetAmountMicros: string;
+      dateRange?: {
+        startDate: { year: number; month: number; day: number };
+        endDate?: { year: number; month: number; day: number };
+      };
+    }>;
+  };
+}
+
+export const sampleInsertionOrder: DV360InsertionOrder = {
+  name: 'advertisers/123456789/insertionOrders/555666777',
+  insertionOrderId: '555666777',
+  displayName: 'Sample Insertion Order',
+  campaignId: '111222333',
+  entityStatus: 'ENTITY_STATUS_ACTIVE',
+  insertionOrderType: 'RTB',
+  pacing: {
+    pacingPeriod: 'PACING_PERIOD_DAILY',
+    pacingType: 'PACING_TYPE_EVEN',
+    dailyMaxMicros: '10000000000',
+  },
+  budget: {
+    budgetUnit: 'BUDGET_UNIT_CURRENCY',
+    budgetSegments: [
+      {
+        budgetAmountMicros: '100000000000',
+        dateRange: {
+          startDate: { year: 2025, month: 11, day: 1 },
+          endDate: { year: 2025, month: 12, day: 31 },
+        },
+      },
+    ],
+  },
+};
+
+// ============================================
+// Line Item Interfaces and Mock Data
+// ============================================
+
+export interface DV360LineItem {
+  name: string;
+  lineItemId: string;
+  displayName: string;
+  insertionOrderId: string;
+  entityStatus: string;
+  lineItemType: string;
+  flight?: {
+    flightDateType: string;
+    dateRange?: {
+      startDate: { year: number; month: number; day: number };
+      endDate?: { year: number; month: number; day: number };
+    };
+  };
+  budget?: {
+    budgetAllocationType: string;
+    maxAmount?: string;
+  };
+  pacing?: {
+    pacingPeriod: string;
+    pacingType: string;
+    dailyMaxMicros?: string;
+  };
+  bidStrategy?: {
+    fixedBid?: {
+      bidAmountMicros: string;
+    };
+    maximizeSpendAutoBid?: {
+      performanceGoalType: string;
+      performanceGoalAmountMicros?: string;
+    };
+  };
+}
+
+export const sampleLineItem: DV360LineItem = {
+  name: 'advertisers/123456789/lineItems/888999000',
+  lineItemId: '888999000',
+  displayName: 'Sample Line Item',
+  insertionOrderId: '555666777',
+  entityStatus: 'ENTITY_STATUS_ACTIVE',
+  lineItemType: 'LINE_ITEM_TYPE_DISPLAY_DEFAULT',
+  flight: {
+    flightDateType: 'LINE_ITEM_FLIGHT_DATE_TYPE_CUSTOM',
+    dateRange: {
+      startDate: { year: 2025, month: 11, day: 1 },
+      endDate: { year: 2025, month: 12, day: 31 },
+    },
+  },
+  budget: {
+    budgetAllocationType: 'LINE_ITEM_BUDGET_ALLOCATION_TYPE_FIXED',
+    maxAmount: '50000000000',
+  },
+  pacing: {
+    pacingPeriod: 'PACING_PERIOD_DAILY',
+    pacingType: 'PACING_TYPE_EVEN',
+    dailyMaxMicros: '2000000000',
+  },
+  bidStrategy: {
+    fixedBid: {
+      bidAmountMicros: '3000000',
+    },
+  },
+};
+
+// ============================================
+// Campaign Metrics Interfaces
+// ============================================
+
+export interface CampaignMetrics {
+  campaignId: string;
+  metrics: {
+    impressions?: string;
+    clicks?: string;
+    totalCostMicros?: string;
+    ctr?: number;
+    averageCpmMicros?: string;
+  };
+  dateRange?: {
+    startDate: { year: number; month: number; day: number };
+    endDate: { year: number; month: number; day: number };
+  };
+}
+
+export const sampleCampaignMetrics: CampaignMetrics = {
+  campaignId: '111222333',
+  metrics: {
+    impressions: '1500000',
+    clicks: '25000',
+    totalCostMicros: '75000000000',
+    ctr: 1.67,
+    averageCpmMicros: '50000000',
+  },
+  dateRange: {
+    startDate: { year: 2025, month: 11, day: 1 },
+    endDate: { year: 2025, month: 11, day: 30 },
+  },
+};
+
+// ============================================
+// List Response Interfaces
+// ============================================
+
+export interface CampaignListResponse {
+  campaigns: DV360Campaign[];
+  nextPageToken?: string;
+}
+
+export interface InsertionOrderListResponse {
+  insertionOrders: DV360InsertionOrder[];
+  nextPageToken?: string;
+}
+
+export interface LineItemListResponse {
+  lineItems: DV360LineItem[];
+  nextPageToken?: string;
+}
+
+export interface CampaignQueryResponse {
+  campaignMetrics: CampaignMetrics[];
+}

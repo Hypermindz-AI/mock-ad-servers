@@ -283,3 +283,136 @@ export const invalidStatusErrorResponse: GoogleAdsErrorResponse = {
     ],
   },
 };
+
+// Ad Group types
+export interface GoogleAdsAdGroup {
+  resourceName: string;
+  id?: string;
+  name: string;
+  campaign: string;
+  status: string;
+  type: string;
+  cpcBidMicros?: string;
+}
+
+export interface GoogleAdsAdGroupOperationResult {
+  resourceName: string;
+  adGroup?: GoogleAdsAdGroup;
+}
+
+// Ad Group Ad types
+export interface GoogleAdsAd {
+  finalUrls: string[];
+  responsiveSearchAd?: {
+    headlines: Array<{ text: string }>;
+    descriptions: Array<{ text: string }>;
+    path1?: string;
+    path2?: string;
+  };
+  expandedTextAd?: {
+    headlinePart1: string;
+    headlinePart2: string;
+    headlinePart3?: string;
+    description: string;
+    description2?: string;
+    path1?: string;
+    path2?: string;
+  };
+  displayUrl?: string;
+  type?: string;
+  id?: string;
+}
+
+export interface GoogleAdsAdGroupAd {
+  resourceName: string;
+  id?: string;
+  adGroup: string;
+  ad: GoogleAdsAd;
+  status: string;
+}
+
+export interface GoogleAdsAdGroupAdOperationResult {
+  resourceName: string;
+  adGroupAd?: GoogleAdsAdGroupAd;
+}
+
+// Search response types
+export interface GoogleAdsMetrics {
+  impressions?: string;
+  clicks?: string;
+  costMicros?: string;
+  ctr?: string;
+  averageCpc?: string;
+  conversions?: string;
+  conversionValue?: string;
+}
+
+export interface GoogleAdsSearchResult {
+  campaign?: {
+    id?: string;
+    name?: string;
+    status?: string;
+    resourceName?: string;
+  };
+  adGroup?: {
+    id?: string;
+    name?: string;
+    status?: string;
+    resourceName?: string;
+    campaign?: string;
+  };
+  adGroupAd?: {
+    resourceName?: string;
+    status?: string;
+    ad?: {
+      id?: string;
+      finalUrls?: string[];
+      type?: string;
+    };
+  };
+  metrics?: GoogleAdsMetrics;
+}
+
+export interface GoogleAdsSearchResponse {
+  results: GoogleAdsSearchResult[];
+  nextPageToken?: string;
+  totalResultsCount?: string;
+  fieldMask?: string;
+}
+
+// Sample ad group
+export const sampleAdGroup: GoogleAdsAdGroup = {
+  resourceName: 'customers/1234567890/adGroups/1111111111',
+  id: '1111111111',
+  name: 'Sample Ad Group',
+  campaign: 'customers/1234567890/campaigns/9876543210',
+  status: 'ENABLED',
+  type: 'SEARCH_STANDARD',
+  cpcBidMicros: '1000000', // $1 in micros
+};
+
+// Sample ad group ad
+export const sampleAdGroupAd: GoogleAdsAdGroupAd = {
+  resourceName: 'customers/1234567890/adGroupAds/1111111111~2222222222',
+  id: '2222222222',
+  adGroup: 'customers/1234567890/adGroups/1111111111',
+  status: 'ENABLED',
+  ad: {
+    id: '2222222222',
+    finalUrls: ['https://example.com'],
+    type: 'RESPONSIVE_SEARCH_AD',
+    responsiveSearchAd: {
+      headlines: [
+        { text: 'Best Product Ever' },
+        { text: 'Shop Now' },
+        { text: 'Limited Time Offer' },
+      ],
+      descriptions: [
+        { text: 'Get the best deals on our products. Shop now and save!' },
+        { text: 'Free shipping on orders over $50.' },
+      ],
+      path1: 'products',
+      path2: 'sale',
+    },
+  },
+};

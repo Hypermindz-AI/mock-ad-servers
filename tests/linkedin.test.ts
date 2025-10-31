@@ -1169,4 +1169,671 @@ describe('LinkedIn Marketing API 202510', () => {
       });
     });
   });
+
+  // ============================================
+  // Campaign Search Tests (LinkedIn 202510)
+  // ============================================
+
+  describe('Campaign Search - GET /rest/adCampaigns?q=search', () => {
+
+    beforeEach(async () => {
+      // Create some campaigns for search testing
+      await request(app)
+        .post('/linkedin/rest/adCampaigns')
+        .set('Authorization', `Bearer ${VALID_TOKEN}`)
+        .set('Linkedin-Version', LINKEDIN_VERSION)
+        .send({
+          account: 'urn:li:sponsoredAccount:123',
+          name: 'Search Test Campaign 1',
+          type: 'TEXT_AD',
+          status: 'ACTIVE'
+        });
+
+      await request(app)
+        .post('/linkedin/rest/adCampaigns')
+        .set('Authorization', `Bearer ${VALID_TOKEN}`)
+        .set('Linkedin-Version', LINKEDIN_VERSION)
+        .send({
+          account: 'urn:li:sponsoredAccount:123',
+          name: 'Search Test Campaign 2',
+          type: 'SPONSORED_UPDATES',
+          status: 'PAUSED'
+        });
+
+      await request(app)
+        .post('/linkedin/rest/adCampaigns')
+        .set('Authorization', `Bearer ${VALID_TOKEN}`)
+        .set('Linkedin-Version', LINKEDIN_VERSION)
+        .send({
+          account: 'urn:li:sponsoredAccount:456',
+          name: 'Different Account Campaign',
+          type: 'TEXT_AD',
+          status: 'ACTIVE'
+        });
+    });
+
+    it('should search campaigns with q=search parameter', async () => {
+      const response = await request(app)
+        .get('/linkedin/rest/adCampaigns')
+        .query({ q: 'search' })
+        .set('Authorization', `Bearer ${VALID_TOKEN}`)
+        .set('Linkedin-Version', LINKEDIN_VERSION);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('elements');
+      expect(response.body).toHaveProperty('paging');
+      expect(Array.isArray(response.body.elements)).toBe(true);
+      expect(response.body.elements.length).toBeGreaterThan(0);
+    });
+
+    it('should return paginated results', async () => {
+      const response = await request(app)
+        .get('/linkedin/rest/adCampaigns')
+        .query({ q: 'search' })
+        .set('Authorization', `Bearer ${VALID_TOKEN}`)
+        .set('Linkedin-Version', LINKEDIN_VERSION);
+
+      expect(response.body.paging).toHaveProperty('start');
+      expect(response.body.paging).toHaveProperty('count');
+      expect(response.body.paging).toHaveProperty('total');
+      expect(response.body.paging.start).toBe(0);
+    });
+
+    it('should filter campaigns by account', async () => {
+      const response = await request(app)
+        .get('/linkedin/rest/adCampaigns')
+        .query({
+          q: 'search',
+          'search.account': 'urn:li:sponsoredAccount:123'
+        })
+        .set('Authorization', `Bearer ${VALID_TOKEN}`)
+        .set('Linkedin-Version', LINKEDIN_VERSION);
+
+      expect(response.status).toBe(200);
+      expect(response.body.elements.every((c: any) => c.account === 'urn:li:sponsoredAccount:123')).toBe(true);
+    });
+
+    it('should filter campaigns by status', async () => {
+      const response = await request(app)
+        .get('/linkedin/rest/adCampaigns')
+        .query({
+          q: 'search',
+          'search.status': 'ACTIVE'
+        })
+        .set('Authorization', `Bearer ${VALID_TOKEN}`)
+        .set('Linkedin-Version', LINKEDIN_VERSION);
+
+      expect(response.status).toBe(200);
+      expect(response.body.elements.every((c: any) => c.status === 'ACTIVE')).toBe(true);
+    });
+
+    it('should filter campaigns by name (partial match)', async () => {
+      const response = await request(app)
+        .get('/linkedin/rest/adCampaigns')
+        .query({
+          q: 'search',
+          'search.name': 'Search Test'
+        })
+        .set('Authorization', `Bearer ${VALID_TOKEN}`)
+        .set('Linkedin-Version', LINKEDIN_VERSION);
+
+      expect(response.status).toBe(200);
+      expect(response.body.elements.every((c: any) => c.name.includes('Search Test'))).toBe(true);
+    });
+
+    it('should support pagination with start and count', async () => {
+      const response = await request(app)
+        .get('/linkedin/rest/adCampaigns')
+        .query({
+          q: 'search',
+          start: 1,
+          count: 1
+        })
+        .set('Authorization', `Bearer ${VALID_TOKEN}`)
+        .set('Linkedin-Version', LINKEDIN_VERSION);
+
+      expect(response.status).toBe(200);
+      expect(response.body.paging.start).toBe(1);
+      expect(response.body.paging.count).toBeLessThanOrEqual(1);
+    });
+
+    it('should fail without q=search parameter', async () => {
+      const response = await request(app)
+        .get('/linkedin/rest/adCampaigns')
+        .set('Authorization', `Bearer ${VALID_TOKEN}`)
+        .set('Linkedin-Version', LINKEDIN_VERSION);
+
+      expect(response.status).toBe(400);
+      expect(response.body.message).toContain('must be "search"');
+    });
+  });
+
+  // ============================================
+  // Analytics Tests (LinkedIn 202510)
+  // ============================================
+
+  describe('Analytics - GET /rest/adAnalytics?q=analytics', () => {
+
+    let campaignId: string;
+
+    beforeEach(async () => {
+      const createResponse = await request(app)
+        .post('/linkedin/rest/adCampaigns')
+        .set('Authorization', `Bearer ${VALID_TOKEN}`)
+        .set('Linkedin-Version', LINKEDIN_VERSION)
+        .send({
+          account: 'urn:li:sponsoredAccount:123',
+          name: 'Analytics Test Campaign',
+          type: 'TEXT_AD',
+          status: 'ACTIVE'
+        });
+
+      campaignId = createResponse.body.id;
+    });
+
+    it('should get analytics with valid parameters', async () => {
+      const response = await request(app)
+        .get('/linkedin/rest/adAnalytics')
+        .query({
+          q: 'analytics',
+          'dateRange.start': '2025-01-01',
+          'dateRange.end': '2025-01-31',
+          campaigns: campaignId
+        })
+        .set('Authorization', `Bearer ${VALID_TOKEN}`)
+        .set('Linkedin-Version', LINKEDIN_VERSION);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('elements');
+      expect(Array.isArray(response.body.elements)).toBe(true);
+      expect(response.body.elements.length).toBe(1);
+    });
+
+    it('should return analytics data with correct structure', async () => {
+      const response = await request(app)
+        .get('/linkedin/rest/adAnalytics')
+        .query({
+          q: 'analytics',
+          'dateRange.start': '2025-01-01',
+          'dateRange.end': '2025-01-31',
+          campaigns: campaignId
+        })
+        .set('Authorization', `Bearer ${VALID_TOKEN}`)
+        .set('Linkedin-Version', LINKEDIN_VERSION);
+
+      const analytics = response.body.elements[0];
+      expect(analytics).toHaveProperty('campaignId', campaignId);
+      expect(analytics).toHaveProperty('dateRange');
+      expect(analytics).toHaveProperty('impressions');
+      expect(analytics).toHaveProperty('clicks');
+      expect(analytics).toHaveProperty('costInLocalCurrency');
+      expect(analytics).toHaveProperty('conversions');
+      expect(typeof analytics.impressions).toBe('number');
+      expect(typeof analytics.clicks).toBe('number');
+    });
+
+    it('should support multiple campaign URNs', async () => {
+      const response = await request(app)
+        .get('/linkedin/rest/adAnalytics')
+        .query({
+          q: 'analytics',
+          'dateRange.start': '2025-01-01',
+          'dateRange.end': '2025-01-31',
+          campaigns: `${campaignId},urn:li:sponsoredCampaign:999999`
+        })
+        .set('Authorization', `Bearer ${VALID_TOKEN}`)
+        .set('Linkedin-Version', LINKEDIN_VERSION);
+
+      expect(response.status).toBe(200);
+      expect(response.body.elements.length).toBe(2);
+    });
+
+    it('should fail without q=analytics parameter', async () => {
+      const response = await request(app)
+        .get('/linkedin/rest/adAnalytics')
+        .query({
+          'dateRange.start': '2025-01-01',
+          'dateRange.end': '2025-01-31',
+          campaigns: campaignId
+        })
+        .set('Authorization', `Bearer ${VALID_TOKEN}`)
+        .set('Linkedin-Version', LINKEDIN_VERSION);
+
+      expect(response.status).toBe(400);
+      expect(response.body.message).toContain('must be "analytics"');
+    });
+
+    it('should fail without dateRange.start', async () => {
+      const response = await request(app)
+        .get('/linkedin/rest/adAnalytics')
+        .query({
+          q: 'analytics',
+          'dateRange.end': '2025-01-31',
+          campaigns: campaignId
+        })
+        .set('Authorization', `Bearer ${VALID_TOKEN}`)
+        .set('Linkedin-Version', LINKEDIN_VERSION);
+
+      expect(response.status).toBe(400);
+      expect(response.body.message).toContain('dateRange.start');
+    });
+
+    it('should fail without dateRange.end', async () => {
+      const response = await request(app)
+        .get('/linkedin/rest/adAnalytics')
+        .query({
+          q: 'analytics',
+          'dateRange.start': '2025-01-01',
+          campaigns: campaignId
+        })
+        .set('Authorization', `Bearer ${VALID_TOKEN}`)
+        .set('Linkedin-Version', LINKEDIN_VERSION);
+
+      expect(response.status).toBe(400);
+      expect(response.body.message).toContain('dateRange.end');
+    });
+
+    it('should fail without campaigns parameter', async () => {
+      const response = await request(app)
+        .get('/linkedin/rest/adAnalytics')
+        .query({
+          q: 'analytics',
+          'dateRange.start': '2025-01-01',
+          'dateRange.end': '2025-01-31'
+        })
+        .set('Authorization', `Bearer ${VALID_TOKEN}`)
+        .set('Linkedin-Version', LINKEDIN_VERSION);
+
+      expect(response.status).toBe(400);
+      expect(response.body.message).toContain('campaigns');
+    });
+
+    it('should fail with invalid date format', async () => {
+      const response = await request(app)
+        .get('/linkedin/rest/adAnalytics')
+        .query({
+          q: 'analytics',
+          'dateRange.start': 'invalid-date',
+          'dateRange.end': '2025-01-31',
+          campaigns: campaignId
+        })
+        .set('Authorization', `Bearer ${VALID_TOKEN}`)
+        .set('Linkedin-Version', LINKEDIN_VERSION);
+
+      expect(response.status).toBe(400);
+      expect(response.body.message).toContain('Invalid date format');
+    });
+
+    it('should fail when start date is after end date', async () => {
+      const response = await request(app)
+        .get('/linkedin/rest/adAnalytics')
+        .query({
+          q: 'analytics',
+          'dateRange.start': '2025-01-31',
+          'dateRange.end': '2025-01-01',
+          campaigns: campaignId
+        })
+        .set('Authorization', `Bearer ${VALID_TOKEN}`)
+        .set('Linkedin-Version', LINKEDIN_VERSION);
+
+      expect(response.status).toBe(400);
+      expect(response.body.message).toContain('Invalid date range');
+    });
+  });
+
+  // ============================================
+  // Campaign Groups Tests (LinkedIn 202510)
+  // ============================================
+
+  describe('Campaign Groups', () => {
+
+    describe('POST /rest/adCampaignGroups - Create Campaign Group', () => {
+
+      it('should create campaign group successfully', async () => {
+        const response = await request(app)
+          .post('/linkedin/rest/adCampaignGroups')
+          .set('Authorization', `Bearer ${VALID_TOKEN}`)
+          .set('Linkedin-Version', LINKEDIN_VERSION)
+          .send({
+            account: 'urn:li:sponsoredAccount:123',
+            name: 'Test Campaign Group',
+            status: 'ACTIVE',
+            totalBudget: {
+              amount: '50000',
+              currencyCode: 'USD'
+            }
+          });
+
+        expect(response.status).toBe(201);
+        expect(response.body).toHaveProperty('id');
+        expect(response.body.id).toMatch(/^urn:li:sponsoredCampaignGroup:\d+$/);
+        expect(response.body.name).toBe('Test Campaign Group');
+        expect(response.body.status).toBe('ACTIVE');
+      });
+
+      it('should create campaign group with runSchedule', async () => {
+        const start = Date.now();
+        const end = start + 2592000000;
+
+        const response = await request(app)
+          .post('/linkedin/rest/adCampaignGroups')
+          .set('Authorization', `Bearer ${VALID_TOKEN}`)
+          .set('Linkedin-Version', LINKEDIN_VERSION)
+          .send({
+            account: 'urn:li:sponsoredAccount:123',
+            name: 'Scheduled Campaign Group',
+            status: 'ACTIVE',
+            runSchedule: {
+              start,
+              end
+            }
+          });
+
+        expect(response.status).toBe(201);
+        expect(response.body.runSchedule).toHaveProperty('start', start);
+        expect(response.body.runSchedule).toHaveProperty('end', end);
+      });
+
+      it('should fail without required fields', async () => {
+        const response = await request(app)
+          .post('/linkedin/rest/adCampaignGroups')
+          .set('Authorization', `Bearer ${VALID_TOKEN}`)
+          .set('Linkedin-Version', LINKEDIN_VERSION)
+          .send({
+            name: 'Missing Account Field'
+          });
+
+        expect(response.status).toBe(400);
+        expect(response.body.details[0].field).toBe('account');
+      });
+    });
+
+    describe('GET /rest/adCampaignGroups?q=search - Search Campaign Groups', () => {
+
+      it('should search campaign groups', async () => {
+        const response = await request(app)
+          .get('/linkedin/rest/adCampaignGroups')
+          .query({ q: 'search' })
+          .set('Authorization', `Bearer ${VALID_TOKEN}`)
+          .set('Linkedin-Version', LINKEDIN_VERSION);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty('elements');
+        expect(response.body).toHaveProperty('paging');
+        expect(Array.isArray(response.body.elements)).toBe(true);
+      });
+
+      it('should filter by account', async () => {
+        const response = await request(app)
+          .get('/linkedin/rest/adCampaignGroups')
+          .query({
+            q: 'search',
+            'search.account': 'urn:li:sponsoredAccount:123'
+          })
+          .set('Authorization', `Bearer ${VALID_TOKEN}`)
+          .set('Linkedin-Version', LINKEDIN_VERSION);
+
+        expect(response.status).toBe(200);
+      });
+    });
+
+    describe('GET /rest/adCampaignGroups/:id - Get Campaign Group', () => {
+
+      let groupId: string;
+
+      beforeEach(async () => {
+        const createResponse = await request(app)
+          .post('/linkedin/rest/adCampaignGroups')
+          .set('Authorization', `Bearer ${VALID_TOKEN}`)
+          .set('Linkedin-Version', LINKEDIN_VERSION)
+          .send({
+            account: 'urn:li:sponsoredAccount:123',
+            name: 'Retrievable Group',
+            status: 'ACTIVE'
+          });
+
+        groupId = createResponse.body.id;
+      });
+
+      it('should retrieve campaign group by URN', async () => {
+        const response = await request(app)
+          .get(`/linkedin/rest/adCampaignGroups/${groupId}`)
+          .set('Authorization', `Bearer ${VALID_TOKEN}`)
+          .set('Linkedin-Version', LINKEDIN_VERSION);
+
+        expect(response.status).toBe(200);
+        expect(response.body.id).toBe(groupId);
+        expect(response.body.name).toBe('Retrievable Group');
+      });
+
+      it('should return 404 for non-existent group', async () => {
+        const response = await request(app)
+          .get('/linkedin/rest/adCampaignGroups/urn:li:sponsoredCampaignGroup:999999')
+          .set('Authorization', `Bearer ${VALID_TOKEN}`)
+          .set('Linkedin-Version', LINKEDIN_VERSION);
+
+        expect(response.status).toBe(404);
+        expect(response.body.message).toContain('Campaign group not found');
+      });
+
+      it('should fail with invalid URN format', async () => {
+        const response = await request(app)
+          .get('/linkedin/rest/adCampaignGroups/invalid_urn')
+          .set('Authorization', `Bearer ${VALID_TOKEN}`)
+          .set('Linkedin-Version', LINKEDIN_VERSION);
+
+        expect(response.status).toBe(400);
+        expect(response.body.message).toContain('Invalid campaign group URN format');
+      });
+    });
+  });
+
+  // ============================================
+  // Creatives Tests (LinkedIn 202510)
+  // ============================================
+
+  describe('Creatives', () => {
+
+    let campaignId: string;
+
+    beforeEach(async () => {
+      const createResponse = await request(app)
+        .post('/linkedin/rest/adCampaigns')
+        .set('Authorization', `Bearer ${VALID_TOKEN}`)
+        .set('Linkedin-Version', LINKEDIN_VERSION)
+        .send({
+          account: 'urn:li:sponsoredAccount:123',
+          name: 'Creative Test Campaign',
+          type: 'TEXT_AD',
+          status: 'ACTIVE'
+        });
+
+      campaignId = createResponse.body.id;
+    });
+
+    describe('POST /rest/adAccounts/:adAccountId/creatives - Create Creative', () => {
+
+      it('should create creative successfully', async () => {
+        const response = await request(app)
+          .post('/linkedin/rest/adAccounts/123/creatives')
+          .set('Authorization', `Bearer ${VALID_TOKEN}`)
+          .set('Linkedin-Version', LINKEDIN_VERSION)
+          .send({
+            campaign: campaignId,
+            status: 'ACTIVE',
+            type: 'SINGLE_IMAGE',
+            content: {
+              title: 'Test Creative',
+              description: 'Creative description',
+              landingPageUrl: 'https://example.com',
+              imageUrl: 'https://example.com/image.jpg'
+            }
+          });
+
+        expect(response.status).toBe(201);
+        expect(response.body).toHaveProperty('id');
+        expect(response.body.id).toMatch(/^urn:li:sponsoredCreative:\d+$/);
+        expect(response.body.campaign).toBe(campaignId);
+        expect(response.body.type).toBe('SINGLE_IMAGE');
+        expect(response.headers['x-restli-id']).toBe(response.body.id);
+      });
+
+      it('should create creative with all valid types', async () => {
+        const types = ['SINGLE_IMAGE', 'VIDEO', 'CAROUSEL', 'TEXT'];
+
+        for (const type of types) {
+          const response = await request(app)
+            .post('/linkedin/rest/adAccounts/123/creatives')
+            .set('Authorization', `Bearer ${VALID_TOKEN}`)
+            .set('Linkedin-Version', LINKEDIN_VERSION)
+            .send({
+              campaign: campaignId,
+              status: 'ACTIVE',
+              type
+            });
+
+          expect(response.status).toBe(201);
+          expect(response.body.type).toBe(type);
+        }
+      });
+
+      it('should fail with invalid creative type', async () => {
+        const response = await request(app)
+          .post('/linkedin/rest/adAccounts/123/creatives')
+          .set('Authorization', `Bearer ${VALID_TOKEN}`)
+          .set('Linkedin-Version', LINKEDIN_VERSION)
+          .send({
+            campaign: campaignId,
+            status: 'ACTIVE',
+            type: 'INVALID_TYPE'
+          });
+
+        expect(response.status).toBe(400);
+        expect(response.body.message).toContain('Invalid creative type');
+      });
+
+      it('should fail without required fields', async () => {
+        const response = await request(app)
+          .post('/linkedin/rest/adAccounts/123/creatives')
+          .set('Authorization', `Bearer ${VALID_TOKEN}`)
+          .set('Linkedin-Version', LINKEDIN_VERSION)
+          .send({
+            status: 'ACTIVE'
+          });
+
+        expect(response.status).toBe(400);
+        expect(response.body.details[0].field).toBe('campaign');
+      });
+
+      it('should fail with invalid campaign URN', async () => {
+        const response = await request(app)
+          .post('/linkedin/rest/adAccounts/123/creatives')
+          .set('Authorization', `Bearer ${VALID_TOKEN}`)
+          .set('Linkedin-Version', LINKEDIN_VERSION)
+          .send({
+            campaign: 'invalid_urn',
+            status: 'ACTIVE',
+            type: 'SINGLE_IMAGE'
+          });
+
+        expect(response.status).toBe(400);
+        expect(response.body.message).toContain('Invalid campaign URN format');
+      });
+    });
+
+    describe('GET /rest/adAccounts/:adAccountId/creatives?q=search - Search Creatives', () => {
+
+      beforeEach(async () => {
+        await request(app)
+          .post('/linkedin/rest/adAccounts/123/creatives')
+          .set('Authorization', `Bearer ${VALID_TOKEN}`)
+          .set('Linkedin-Version', LINKEDIN_VERSION)
+          .send({
+            campaign: campaignId,
+            status: 'ACTIVE',
+            type: 'SINGLE_IMAGE'
+          });
+      });
+
+      it('should search creatives', async () => {
+        const response = await request(app)
+          .get('/linkedin/rest/adAccounts/123/creatives')
+          .query({ q: 'search' })
+          .set('Authorization', `Bearer ${VALID_TOKEN}`)
+          .set('Linkedin-Version', LINKEDIN_VERSION);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty('elements');
+        expect(response.body).toHaveProperty('paging');
+        expect(Array.isArray(response.body.elements)).toBe(true);
+      });
+
+      it('should filter by campaign', async () => {
+        const response = await request(app)
+          .get('/linkedin/rest/adAccounts/123/creatives')
+          .query({
+            q: 'search',
+            'search.campaign': campaignId
+          })
+          .set('Authorization', `Bearer ${VALID_TOKEN}`)
+          .set('Linkedin-Version', LINKEDIN_VERSION);
+
+        expect(response.status).toBe(200);
+        expect(response.body.elements.every((c: any) => c.campaign === campaignId)).toBe(true);
+      });
+    });
+
+    describe('GET /rest/creatives/:creativeId - Get Creative', () => {
+
+      let creativeId: string;
+
+      beforeEach(async () => {
+        const createResponse = await request(app)
+          .post('/linkedin/rest/adAccounts/123/creatives')
+          .set('Authorization', `Bearer ${VALID_TOKEN}`)
+          .set('Linkedin-Version', LINKEDIN_VERSION)
+          .send({
+            campaign: campaignId,
+            status: 'ACTIVE',
+            type: 'SINGLE_IMAGE',
+            content: {
+              title: 'Retrievable Creative'
+            }
+          });
+
+        creativeId = createResponse.body.id;
+      });
+
+      it('should retrieve creative by URN', async () => {
+        const response = await request(app)
+          .get(`/linkedin/rest/creatives/${creativeId}`)
+          .set('Authorization', `Bearer ${VALID_TOKEN}`)
+          .set('Linkedin-Version', LINKEDIN_VERSION);
+
+        expect(response.status).toBe(200);
+        expect(response.body.id).toBe(creativeId);
+        expect(response.body.content.title).toBe('Retrievable Creative');
+      });
+
+      it('should return 404 for non-existent creative', async () => {
+        const response = await request(app)
+          .get('/linkedin/rest/creatives/urn:li:sponsoredCreative:999999')
+          .set('Authorization', `Bearer ${VALID_TOKEN}`)
+          .set('Linkedin-Version', LINKEDIN_VERSION);
+
+        expect(response.status).toBe(404);
+        expect(response.body.message).toContain('Creative not found');
+      });
+
+      it('should fail with invalid URN format', async () => {
+        const response = await request(app)
+          .get('/linkedin/rest/creatives/invalid_urn')
+          .set('Authorization', `Bearer ${VALID_TOKEN}`)
+          .set('Linkedin-Version', LINKEDIN_VERSION);
+
+        expect(response.status).toBe(400);
+        expect(response.body.message).toContain('Invalid creative URN format');
+      });
+    });
+  });
 });

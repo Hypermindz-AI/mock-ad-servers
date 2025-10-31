@@ -117,3 +117,179 @@ export const sampleCampaigns: TTDCampaign[] = [
     Availability: 'Active',
   },
 ];
+
+/**
+ * Ad Group interfaces and mock data
+ */
+export interface TTDAdGroup {
+  AdGroupId: string;
+  AdGroupName: string;
+  CampaignId: string;
+  Budget?: {
+    Amount: number;
+    CurrencyCode: string;
+    DailyTargetAmount?: number;
+  };
+  MaxBid?: {
+    Amount: number;
+    CurrencyCode: string;
+  };
+  BaseBidCPM?: {
+    Amount: number;
+    CurrencyCode: string;
+  };
+  Availability?: string;
+  PacingMode?: string;
+  RTBAttributes?: {
+    BidList?: string[];
+  };
+}
+
+export const sampleAdGroup: TTDAdGroup = {
+  AdGroupId: 'ttd_adgroup_abc123',
+  AdGroupName: 'Test Ad Group',
+  CampaignId: 'ttd_campaign_789xyz',
+  Budget: {
+    Amount: 5000,
+    CurrencyCode: 'USD',
+    DailyTargetAmount: 100,
+  },
+  MaxBid: {
+    Amount: 10.50,
+    CurrencyCode: 'USD',
+  },
+  BaseBidCPM: {
+    Amount: 5.00,
+    CurrencyCode: 'USD',
+  },
+  Availability: 'Active',
+  PacingMode: 'EvenPacing',
+  RTBAttributes: {
+    BidList: ['bid_001', 'bid_002'],
+  },
+};
+
+/**
+ * Creative interfaces and mock data
+ */
+export interface TTDCreative {
+  CreativeId: string;
+  CreativeName: string;
+  AdvertiserId: string;
+  CreativeType: string;
+  ThirdPartyTag?: string;
+  ClickthroughUrl?: string;
+  LandingPageUrl?: string;
+  Availability?: string;
+  CreativeAttributes?: {
+    Width?: number;
+    Height?: number;
+    FileSize?: number;
+  };
+}
+
+export const sampleCreative: TTDCreative = {
+  CreativeId: 'ttd_creative_xyz789',
+  CreativeName: 'Test Banner Creative',
+  AdvertiserId: 'advertiser_abc123',
+  CreativeType: 'ThirdPartyTag',
+  ThirdPartyTag: '<script src="https://example.com/ad.js"></script>',
+  ClickthroughUrl: 'https://example.com/click',
+  LandingPageUrl: 'https://example.com/landing',
+  Availability: 'Active',
+  CreativeAttributes: {
+    Width: 300,
+    Height: 250,
+    FileSize: 150000,
+  },
+};
+
+/**
+ * Campaign Query Response interfaces and mock data
+ */
+export interface TTDCampaignQueryRequest {
+  AdvertiserIds: string[];
+  PageStartIndex?: number;
+  PageSize?: number;
+}
+
+export interface TTDCampaignQueryResponse {
+  Result: TTDCampaign[];
+  ResultCount: number;
+}
+
+export const sampleCampaignQueryResponse: TTDCampaignQueryResponse = {
+  Result: sampleCampaigns,
+  ResultCount: sampleCampaigns.length,
+};
+
+/**
+ * Campaign Reporting interfaces and mock data
+ */
+export interface TTDCampaignReport {
+  CampaignId: string;
+  CampaignName: string;
+  AdvertiserId: string;
+  Impressions: number;
+  Clicks: number;
+  TotalCost: number;
+  Conversions: number;
+  CTR?: number;
+  CPC?: number;
+  CPM?: number;
+  ConversionRate?: number;
+}
+
+export interface TTDCampaignReportingResponse {
+  Result: TTDCampaignReport[];
+  ResultCount: number;
+}
+
+export const sampleCampaignReport: TTDCampaignReport = {
+  CampaignId: 'ttd_campaign_789xyz',
+  CampaignName: 'Test Campaign',
+  AdvertiserId: 'advertiser_abc123',
+  Impressions: 100000,
+  Clicks: 500,
+  TotalCost: 1500.00,
+  Conversions: 25,
+  CTR: 0.5,
+  CPC: 3.00,
+  CPM: 15.00,
+  ConversionRate: 5.0,
+};
+
+export const sampleCampaignReports: TTDCampaignReport[] = [
+  sampleCampaignReport,
+  {
+    CampaignId: 'ttd_campaign_456def',
+    CampaignName: 'Brand Awareness Campaign',
+    AdvertiserId: 'advertiser_abc123',
+    Impressions: 250000,
+    Clicks: 1200,
+    TotalCost: 3750.00,
+    Conversions: 60,
+    CTR: 0.48,
+    CPC: 3.125,
+    CPM: 15.00,
+    ConversionRate: 5.0,
+  },
+  {
+    CampaignId: 'ttd_campaign_123ghi',
+    CampaignName: 'Performance Campaign',
+    AdvertiserId: 'advertiser_xyz789',
+    Impressions: 500000,
+    Clicks: 3000,
+    TotalCost: 7500.00,
+    Conversions: 150,
+    CTR: 0.6,
+    CPC: 2.50,
+    CPM: 15.00,
+    ConversionRate: 5.0,
+  },
+];
+
+export const sampleCampaignReportingResponse: TTDCampaignReportingResponse = {
+  Result: sampleCampaignReports,
+  ResultCount: sampleCampaignReports.length,
+};

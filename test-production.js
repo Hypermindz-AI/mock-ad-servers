@@ -162,6 +162,93 @@ async function runTests() {
     }
   })) { passed++; } else { failed++; }
 
+  // Test Meta Campaign Listing
+  if (await testEndpoint('Meta - List Campaigns', {
+    method: 'GET',
+    url: `${BASE_URL}/meta/v23.0/act_123456789/campaigns?fields=name,status,objective&limit=5`,
+    headers: {
+      'Authorization': `Bearer ${VALID_TOKENS.meta}`
+    }
+  })) { passed++; } else { failed++; }
+
+  // Test Meta Campaign Insights
+  if (await testEndpoint('Meta - Get Campaign Insights', {
+    method: 'GET',
+    url: `${BASE_URL}/meta/v23.0/120210000000001/insights?date_preset=last_7d`,
+    headers: {
+      'Authorization': `Bearer ${VALID_TOKENS.meta}`
+    }
+  })) { passed++; } else { failed++; }
+
+  // Test Google Ads Search (GAQL)
+  if (await testEndpoint('Google Ads - Search Campaigns', {
+    method: 'POST',
+    url: `${BASE_URL}/googleads/v21/customers/1234567890/googleAds:search`,
+    headers: {
+      'Authorization': `Bearer ${VALID_TOKENS.googleAds}`,
+      'developer-token': 'mock_developer_token',
+      'Content-Type': 'application/json'
+    },
+    data: {
+      query: 'SELECT campaign.id, campaign.name, campaign.status FROM campaign',
+      pageSize: 10
+    }
+  })) { passed++; } else { failed++; }
+
+  // Test LinkedIn Campaign Search
+  if (await testEndpoint('LinkedIn - Search Campaigns', {
+    method: 'GET',
+    url: `${BASE_URL}/linkedin/rest/adCampaigns?q=search&search.account=urn:li:sponsoredAccount:123456789`,
+    headers: {
+      'Authorization': `Bearer ${VALID_TOKENS.linkedin}`,
+      'Linkedin-Version': '202510'
+    }
+  })) { passed++; } else { failed++; }
+
+  // Test TikTok Integrated Reporting
+  if (await testEndpoint('TikTok - Get Integrated Report', {
+    method: 'POST',
+    url: `${BASE_URL}/tiktok/v1.3/reports/integrated/get/`,
+    headers: {
+      'Authorization': `Bearer ${VALID_TOKENS.tiktok}`,
+      'Content-Type': 'application/json'
+    },
+    data: {
+      advertiser_id: '1234567890',
+      data_level: 'AUCTION_CAMPAIGN',
+      dimensions: ['campaign_id', 'stat_time_day'],
+      metrics: ['spend', 'impressions', 'clicks'],
+      start_date: '2025-01-01',
+      end_date: '2025-01-31',
+      page: 1,
+      page_size: 10
+    }
+  })) { passed++; } else { failed++; }
+
+  // Test Trade Desk Campaign Query
+  if (await testEndpoint('Trade Desk - Query Campaigns', {
+    method: 'POST',
+    url: `${BASE_URL}/ttd/v3/campaign/query/facets`,
+    headers: {
+      'TTD-Auth': VALID_TOKENS.ttd,
+      'Content-Type': 'application/json'
+    },
+    data: {
+      AdvertiserIds: ['test-advertiser'],
+      PageStartIndex: 0,
+      PageSize: 10
+    }
+  })) { passed++; } else { failed++; }
+
+  // Test DV360 List Campaigns
+  if (await testEndpoint('DV360 - List Campaigns', {
+    method: 'GET',
+    url: `${BASE_URL}/dv360/v4/advertisers/123456789/campaigns?pageSize=10`,
+    headers: {
+      'Authorization': `Bearer ${VALID_TOKENS.dv360}`
+    }
+  })) { passed++; } else { failed++; }
+
   console.log('=' .repeat(60));
   console.log(`\n📊 Results: ${passed} passed, ${failed} failed out of ${passed + failed} tests\n`);
 

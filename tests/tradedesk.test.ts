@@ -975,4 +975,722 @@ describe('The Trade Desk API v3', () => {
       });
     });
   });
+
+  // ============================================
+  // Campaign Query/Facets Tests
+  // ============================================
+
+  describe('POST /v3/campaign/query/facets', () => {
+
+    it('should query campaigns successfully with valid AdvertiserIds', async () => {
+      const response = await request(app)
+        .post('/ttd/v3/campaign/query/facets')
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .send({
+          AdvertiserIds: ['advertiser_abc123'],
+          PageStartIndex: 0,
+          PageSize: 100,
+        })
+        .expect(200);
+
+      // Verify response structure
+      expect(response.body).toHaveProperty('Result');
+      expect(response.body).toHaveProperty('ResultCount');
+      expect(Array.isArray(response.body.Result)).toBe(true);
+      expect(typeof response.body.ResultCount).toBe('number');
+    });
+
+    it('should return 400 when AdvertiserIds is missing', async () => {
+      const response = await request(app)
+        .post('/ttd/v3/campaign/query/facets')
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .send({
+          PageStartIndex: 0,
+          PageSize: 100,
+        })
+        .expect(400);
+
+      expect(response.body).toHaveProperty('Message');
+      expect(response.body.Message).toContain('AdvertiserIds is required');
+      expect(response.body.ErrorCode).toBe('VALIDATION_ERROR');
+    });
+
+    it('should return 400 when AdvertiserIds is not an array', async () => {
+      const response = await request(app)
+        .post('/ttd/v3/campaign/query/facets')
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .send({
+          AdvertiserIds: 'not-an-array',
+          PageStartIndex: 0,
+          PageSize: 100,
+        })
+        .expect(400);
+
+      expect(response.body).toHaveProperty('Message');
+      expect(response.body.Message).toContain('AdvertiserIds is required and must be an array');
+    });
+
+    it('should return 400 when AdvertiserIds is empty array', async () => {
+      const response = await request(app)
+        .post('/ttd/v3/campaign/query/facets')
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .send({
+          AdvertiserIds: [],
+          PageStartIndex: 0,
+          PageSize: 100,
+        })
+        .expect(400);
+
+      expect(response.body.Message).toContain('AdvertiserIds array cannot be empty');
+    });
+
+    it('should apply pagination defaults when not provided', async () => {
+      const response = await request(app)
+        .post('/ttd/v3/campaign/query/facets')
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .send({
+          AdvertiserIds: ['advertiser_abc123'],
+        })
+        .expect(200);
+
+      expect(response.body).toHaveProperty('Result');
+      expect(response.body).toHaveProperty('ResultCount');
+    });
+
+    it('should return 400 when PageStartIndex is negative', async () => {
+      const response = await request(app)
+        .post('/ttd/v3/campaign/query/facets')
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .send({
+          AdvertiserIds: ['advertiser_abc123'],
+          PageStartIndex: -1,
+          PageSize: 100,
+        })
+        .expect(400);
+
+      expect(response.body.Message).toContain('PageStartIndex must be non-negative');
+    });
+
+    it('should return 400 when PageSize exceeds maximum', async () => {
+      const response = await request(app)
+        .post('/ttd/v3/campaign/query/facets')
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .send({
+          AdvertiserIds: ['advertiser_abc123'],
+          PageStartIndex: 0,
+          PageSize: 1001,
+        })
+        .expect(400);
+
+      expect(response.body.Message).toContain('PageSize must be between 1 and 1000');
+    });
+
+    it('should filter campaigns by advertiser ID', async () => {
+      const response = await request(app)
+        .post('/ttd/v3/campaign/query/facets')
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .send({
+          AdvertiserIds: ['advertiser_abc123'],
+        })
+        .expect(200);
+
+      // All returned campaigns should match the advertiser ID
+      response.body.Result.forEach((campaign: any) => {
+        expect(['advertiser_abc123']).toContain(campaign.AdvertiserId);
+      });
+    });
+
+    it('should require TTD-Auth header', async () => {
+      const response = await request(app)
+        .post('/ttd/v3/campaign/query/facets')
+        .send({
+          AdvertiserIds: ['advertiser_abc123'],
+        })
+        .expect(401);
+
+      expect(response.body.Message).toBe('TTD-Auth header is required');
+    });
+  });
+
+  // ============================================
+  // Campaign Reporting Tests
+  // ============================================
+
+  describe('GET /v3/myreports/reportexecution/query/campaign', () => {
+
+    it('should get campaign reporting data successfully', async () => {
+      const response = await request(app)
+        .get('/ttd/v3/myreports/reportexecution/query/campaign')
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .query({
+          AdvertiserIds: 'advertiser_abc123',
+          StartDateInclusive: '2025-01-01',
+          EndDateExclusive: '2025-12-31',
+        })
+        .expect(200);
+
+      // Verify response structure
+      expect(response.body).toHaveProperty('Result');
+      expect(response.body).toHaveProperty('ResultCount');
+      expect(Array.isArray(response.body.Result)).toBe(true);
+
+      // Verify report data structure
+      if (response.body.Result.length > 0) {
+        const report = response.body.Result[0];
+        expect(report).toHaveProperty('CampaignId');
+        expect(report).toHaveProperty('Impressions');
+        expect(report).toHaveProperty('Clicks');
+        expect(report).toHaveProperty('TotalCost');
+        expect(report).toHaveProperty('Conversions');
+      }
+    });
+
+    it('should return 400 when AdvertiserIds query parameter is missing', async () => {
+      const response = await request(app)
+        .get('/ttd/v3/myreports/reportexecution/query/campaign')
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .query({
+          StartDateInclusive: '2025-01-01',
+          EndDateExclusive: '2025-12-31',
+        })
+        .expect(400);
+
+      expect(response.body.Message).toContain('AdvertiserIds query parameter is required');
+    });
+
+    it('should return 400 when StartDateInclusive is missing', async () => {
+      const response = await request(app)
+        .get('/ttd/v3/myreports/reportexecution/query/campaign')
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .query({
+          AdvertiserIds: 'advertiser_abc123',
+          EndDateExclusive: '2025-12-31',
+        })
+        .expect(400);
+
+      expect(response.body.Message).toContain('StartDateInclusive query parameter is required');
+    });
+
+    it('should return 400 when EndDateExclusive is missing', async () => {
+      const response = await request(app)
+        .get('/ttd/v3/myreports/reportexecution/query/campaign')
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .query({
+          AdvertiserIds: 'advertiser_abc123',
+          StartDateInclusive: '2025-01-01',
+        })
+        .expect(400);
+
+      expect(response.body.Message).toContain('EndDateExclusive query parameter is required');
+    });
+
+    it('should accept comma-separated advertiser IDs', async () => {
+      const response = await request(app)
+        .get('/ttd/v3/myreports/reportexecution/query/campaign')
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .query({
+          AdvertiserIds: 'advertiser_abc123,advertiser_xyz789',
+          StartDateInclusive: '2025-01-01',
+          EndDateExclusive: '2025-12-31',
+        })
+        .expect(200);
+
+      expect(response.body).toHaveProperty('Result');
+    });
+
+    it('should validate date format for StartDateInclusive', async () => {
+      const response = await request(app)
+        .get('/ttd/v3/myreports/reportexecution/query/campaign')
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .query({
+          AdvertiserIds: 'advertiser_abc123',
+          StartDateInclusive: 'invalid-date',
+          EndDateExclusive: '2025-12-31',
+        })
+        .expect(400);
+
+      expect(response.body.Message).toContain('StartDateInclusive must be in ISO 8601 format');
+    });
+
+    it('should accept ISO 8601 date with time', async () => {
+      const response = await request(app)
+        .get('/ttd/v3/myreports/reportexecution/query/campaign')
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .query({
+          AdvertiserIds: 'advertiser_abc123',
+          StartDateInclusive: '2025-01-01T00:00:00Z',
+          EndDateExclusive: '2025-12-31T23:59:59Z',
+        })
+        .expect(200);
+
+      expect(response.body).toHaveProperty('Result');
+    });
+
+    it('should apply pagination with PageStartIndex and PageSize', async () => {
+      const response = await request(app)
+        .get('/ttd/v3/myreports/reportexecution/query/campaign')
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .query({
+          AdvertiserIds: 'advertiser_abc123',
+          StartDateInclusive: '2025-01-01',
+          EndDateExclusive: '2025-12-31',
+          PageStartIndex: 0,
+          PageSize: 10,
+        })
+        .expect(200);
+
+      expect(response.body).toHaveProperty('Result');
+      expect(response.body.Result.length).toBeLessThanOrEqual(10);
+    });
+
+    it('should require TTD-Auth header', async () => {
+      const response = await request(app)
+        .get('/ttd/v3/myreports/reportexecution/query/campaign')
+        .query({
+          AdvertiserIds: 'advertiser_abc123',
+          StartDateInclusive: '2025-01-01',
+          EndDateExclusive: '2025-12-31',
+        })
+        .expect(401);
+
+      expect(response.body.Message).toBe('TTD-Auth header is required');
+    });
+  });
+
+  // ============================================
+  // Ad Group Tests - GET
+  // ============================================
+
+  describe('GET /v3/adgroup/:id', () => {
+
+    it('should retrieve ad group successfully', async () => {
+      const adGroupId = 'ttd_adgroup_12345';
+
+      const response = await request(app)
+        .get(`/ttd/v3/adgroup/${adGroupId}`)
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .expect(200);
+
+      // Verify response structure (PascalCase)
+      expect(response.body).toHaveProperty('AdGroupId');
+      expect(response.body).toHaveProperty('AdGroupName');
+      expect(response.body).toHaveProperty('CampaignId');
+      expect(response.body).toHaveProperty('Budget');
+      expect(response.body).toHaveProperty('Availability');
+
+      // Verify ad group ID matches request
+      expect(response.body.AdGroupId).toBe(adGroupId);
+    });
+
+    it('should require TTD-Auth header', async () => {
+      const response = await request(app)
+        .get('/ttd/v3/adgroup/test_123')
+        .expect(401);
+
+      expect(response.body.Message).toBe('TTD-Auth header is required');
+    });
+  });
+
+  // ============================================
+  // Ad Group Tests - POST (Create)
+  // ============================================
+
+  describe('POST /v3/adgroup', () => {
+
+    const validAdGroupData = {
+      AdGroupName: 'Test Ad Group',
+      CampaignId: 'campaign_12345',
+      Budget: {
+        Amount: 5000,
+        CurrencyCode: 'USD',
+      },
+    };
+
+    it('should create ad group successfully with valid data', async () => {
+      const response = await request(app)
+        .post('/ttd/v3/adgroup')
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .send(validAdGroupData)
+        .expect(200);
+
+      // Verify response structure
+      expect(response.body).toHaveProperty('AdGroupId');
+      expect(response.body).toHaveProperty('AdGroupName');
+      expect(response.body.AdGroupName).toBe(validAdGroupData.AdGroupName);
+      expect(response.body.AdGroupId).toMatch(/^ttd_adgroup_\d+$/);
+    });
+
+    it('should return 400 when AdGroupName is missing', async () => {
+      const response = await request(app)
+        .post('/ttd/v3/adgroup')
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .send({
+          CampaignId: 'campaign_12345',
+          Budget: { Amount: 5000, CurrencyCode: 'USD' },
+        })
+        .expect(400);
+
+      expect(response.body.Message).toBe('Invalid request: AdGroupName is required');
+    });
+
+    it('should return 400 when CampaignId is missing', async () => {
+      const response = await request(app)
+        .post('/ttd/v3/adgroup')
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .send({
+          AdGroupName: 'Test Ad Group',
+          Budget: { Amount: 5000, CurrencyCode: 'USD' },
+        })
+        .expect(400);
+
+      expect(response.body.Message).toBe('Invalid request: CampaignId is required');
+    });
+
+    it('should return 400 when Budget.Amount is invalid', async () => {
+      const response = await request(app)
+        .post('/ttd/v3/adgroup')
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .send({
+          AdGroupName: 'Test Ad Group',
+          CampaignId: 'campaign_12345',
+          Budget: { Amount: 0, CurrencyCode: 'USD' },
+        })
+        .expect(400);
+
+      expect(response.body.Message).toContain('Budget.Amount must be greater than 0');
+    });
+
+    it('should return 400 when Budget.CurrencyCode is missing', async () => {
+      const response = await request(app)
+        .post('/ttd/v3/adgroup')
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .send({
+          AdGroupName: 'Test Ad Group',
+          CampaignId: 'campaign_12345',
+          Budget: { Amount: 5000 },
+        })
+        .expect(400);
+
+      expect(response.body.Message).toContain('Budget.CurrencyCode is required');
+    });
+
+    it('should create ad group without Budget (optional)', async () => {
+      const response = await request(app)
+        .post('/ttd/v3/adgroup')
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .send({
+          AdGroupName: 'Test Ad Group',
+          CampaignId: 'campaign_12345',
+        })
+        .expect(200);
+
+      expect(response.body).toHaveProperty('AdGroupId');
+    });
+
+    it('should require TTD-Auth header', async () => {
+      const response = await request(app)
+        .post('/ttd/v3/adgroup')
+        .send(validAdGroupData)
+        .expect(401);
+
+      expect(response.body.Message).toBe('TTD-Auth header is required');
+    });
+  });
+
+  // ============================================
+  // Ad Group Tests - PUT (Update)
+  // ============================================
+
+  describe('PUT /v3/adgroup/:id', () => {
+
+    const adGroupId = 'ttd_adgroup_12345';
+
+    it('should update ad group successfully', async () => {
+      const response = await request(app)
+        .put(`/ttd/v3/adgroup/${adGroupId}`)
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .send({
+          AdGroupName: 'Updated Ad Group',
+          Availability: 'Paused',
+        })
+        .expect(200);
+
+      expect(response.body).toHaveProperty('AdGroupId');
+      expect(response.body.AdGroupId).toBe(adGroupId);
+      expect(response.body.AdGroupName).toBe('Updated Ad Group');
+      expect(response.body.Availability).toBe('Paused');
+    });
+
+    it('should return 400 with invalid Availability value', async () => {
+      const response = await request(app)
+        .put(`/ttd/v3/adgroup/${adGroupId}`)
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .send({
+          Availability: 'InvalidStatus',
+        })
+        .expect(400);
+
+      expect(response.body.Message).toContain('Availability must be one of');
+    });
+
+    it('should accept valid Availability values', async () => {
+      const validStatuses = ['Active', 'Paused', 'Archived'];
+
+      for (const status of validStatuses) {
+        const response = await request(app)
+          .put(`/ttd/v3/adgroup/${adGroupId}`)
+          .set('TTD-Auth', TTD_VALID_TOKEN)
+          .send({ Availability: status })
+          .expect(200);
+
+        expect(response.body.Availability).toBe(status);
+      }
+    });
+
+    it('should return 400 when Budget.Amount is invalid', async () => {
+      const response = await request(app)
+        .put(`/ttd/v3/adgroup/${adGroupId}`)
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .send({
+          Budget: { Amount: -1000, CurrencyCode: 'USD' },
+        })
+        .expect(400);
+
+      expect(response.body.Message).toContain('Budget.Amount must be greater than 0');
+    });
+
+    it('should require TTD-Auth header', async () => {
+      const response = await request(app)
+        .put(`/ttd/v3/adgroup/${adGroupId}`)
+        .send({ AdGroupName: 'Updated' })
+        .expect(401);
+
+      expect(response.body.Message).toBe('TTD-Auth header is required');
+    });
+  });
+
+  // ============================================
+  // Creative Tests - GET
+  // ============================================
+
+  describe('GET /v3/creative/:id', () => {
+
+    it('should retrieve creative successfully', async () => {
+      const creativeId = 'ttd_creative_12345';
+
+      const response = await request(app)
+        .get(`/ttd/v3/creative/${creativeId}`)
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .expect(200);
+
+      // Verify response structure (PascalCase)
+      expect(response.body).toHaveProperty('CreativeId');
+      expect(response.body).toHaveProperty('CreativeName');
+      expect(response.body).toHaveProperty('AdvertiserId');
+      expect(response.body).toHaveProperty('CreativeType');
+      expect(response.body).toHaveProperty('Availability');
+
+      // Verify creative ID matches request
+      expect(response.body.CreativeId).toBe(creativeId);
+    });
+
+    it('should require TTD-Auth header', async () => {
+      const response = await request(app)
+        .get('/ttd/v3/creative/test_123')
+        .expect(401);
+
+      expect(response.body.Message).toBe('TTD-Auth header is required');
+    });
+  });
+
+  // ============================================
+  // Creative Tests - POST (Create)
+  // ============================================
+
+  describe('POST /v3/creative', () => {
+
+    const validCreativeData = {
+      CreativeName: 'Test Creative',
+      AdvertiserId: 'advertiser_12345',
+      CreativeType: 'ThirdPartyTag',
+    };
+
+    it('should create creative successfully with valid data', async () => {
+      const response = await request(app)
+        .post('/ttd/v3/creative')
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .send(validCreativeData)
+        .expect(200);
+
+      // Verify response structure
+      expect(response.body).toHaveProperty('CreativeId');
+      expect(response.body).toHaveProperty('CreativeName');
+      expect(response.body.CreativeName).toBe(validCreativeData.CreativeName);
+      expect(response.body.CreativeId).toMatch(/^ttd_creative_\d+$/);
+    });
+
+    it('should return 400 when CreativeName is missing', async () => {
+      const response = await request(app)
+        .post('/ttd/v3/creative')
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .send({
+          AdvertiserId: 'advertiser_12345',
+          CreativeType: 'ThirdPartyTag',
+        })
+        .expect(400);
+
+      expect(response.body.Message).toBe('Invalid request: CreativeName is required');
+    });
+
+    it('should return 400 when AdvertiserId is missing', async () => {
+      const response = await request(app)
+        .post('/ttd/v3/creative')
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .send({
+          CreativeName: 'Test Creative',
+          CreativeType: 'ThirdPartyTag',
+        })
+        .expect(400);
+
+      expect(response.body.Message).toBe('Invalid request: AdvertiserId is required');
+    });
+
+    it('should return 400 when CreativeType is missing', async () => {
+      const response = await request(app)
+        .post('/ttd/v3/creative')
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .send({
+          CreativeName: 'Test Creative',
+          AdvertiserId: 'advertiser_12345',
+        })
+        .expect(400);
+
+      expect(response.body.Message).toBe('Invalid request: CreativeType is required');
+    });
+
+    it('should return 400 with invalid CreativeType', async () => {
+      const response = await request(app)
+        .post('/ttd/v3/creative')
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .send({
+          CreativeName: 'Test Creative',
+          AdvertiserId: 'advertiser_12345',
+          CreativeType: 'InvalidType',
+        })
+        .expect(400);
+
+      expect(response.body.Message).toContain('CreativeType must be one of');
+    });
+
+    it('should accept valid CreativeType values', async () => {
+      const validTypes = ['ThirdPartyTag', 'Html5', 'Native', 'Video', 'Audio', 'Display'];
+
+      for (const type of validTypes) {
+        const response = await request(app)
+          .post('/ttd/v3/creative')
+          .set('TTD-Auth', TTD_VALID_TOKEN)
+          .send({
+            CreativeName: 'Test Creative',
+            AdvertiserId: 'advertiser_12345',
+            CreativeType: type,
+          })
+          .expect(200);
+
+        expect(response.body).toHaveProperty('CreativeId');
+      }
+    });
+
+    it('should require TTD-Auth header', async () => {
+      const response = await request(app)
+        .post('/ttd/v3/creative')
+        .send(validCreativeData)
+        .expect(401);
+
+      expect(response.body.Message).toBe('TTD-Auth header is required');
+    });
+  });
+
+  // ============================================
+  // Creative Tests - PUT (Update)
+  // ============================================
+
+  describe('PUT /v3/creative/:id', () => {
+
+    const creativeId = 'ttd_creative_12345';
+
+    it('should update creative successfully', async () => {
+      const response = await request(app)
+        .put(`/ttd/v3/creative/${creativeId}`)
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .send({
+          CreativeName: 'Updated Creative',
+          Availability: 'Paused',
+        })
+        .expect(200);
+
+      expect(response.body).toHaveProperty('CreativeId');
+      expect(response.body.CreativeId).toBe(creativeId);
+      expect(response.body.CreativeName).toBe('Updated Creative');
+      expect(response.body.Availability).toBe('Paused');
+    });
+
+    it('should return 400 with invalid Availability value', async () => {
+      const response = await request(app)
+        .put(`/ttd/v3/creative/${creativeId}`)
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .send({
+          Availability: 'InvalidStatus',
+        })
+        .expect(400);
+
+      expect(response.body.Message).toContain('Availability must be one of');
+    });
+
+    it('should accept valid Availability values', async () => {
+      const validStatuses = ['Active', 'Paused', 'Archived'];
+
+      for (const status of validStatuses) {
+        const response = await request(app)
+          .put(`/ttd/v3/creative/${creativeId}`)
+          .set('TTD-Auth', TTD_VALID_TOKEN)
+          .send({ Availability: status })
+          .expect(200);
+
+        expect(response.body.Availability).toBe(status);
+      }
+    });
+
+    it('should update CreativeType', async () => {
+      const response = await request(app)
+        .put(`/ttd/v3/creative/${creativeId}`)
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .send({
+          CreativeType: 'Video',
+        })
+        .expect(200);
+
+      expect(response.body.CreativeType).toBe('Video');
+    });
+
+    it('should return 400 with invalid CreativeType', async () => {
+      const response = await request(app)
+        .put(`/ttd/v3/creative/${creativeId}`)
+        .set('TTD-Auth', TTD_VALID_TOKEN)
+        .send({
+          CreativeType: 'InvalidType',
+        })
+        .expect(400);
+
+      expect(response.body.Message).toContain('CreativeType must be one of');
+    });
+
+    it('should require TTD-Auth header', async () => {
+      const response = await request(app)
+        .put(`/ttd/v3/creative/${creativeId}`)
+        .send({ CreativeName: 'Updated' })
+        .expect(401);
+
+      expect(response.body.Message).toBe('TTD-Auth header is required');
+    });
+  });
 });

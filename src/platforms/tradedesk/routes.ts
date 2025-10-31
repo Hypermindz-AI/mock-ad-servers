@@ -1,6 +1,18 @@
 import express, { Router } from 'express';
 import { authenticate, validateTTDAuth } from '../../auth/tradedesk-token';
-import { createCampaign, updateCampaign, getCampaign } from './controllers';
+import {
+  createCampaign,
+  updateCampaign,
+  getCampaign,
+  queryCampaignsFacets,
+  getCampaignReporting,
+  getAdGroup,
+  createAdGroup,
+  updateAdGroup,
+  getCreative,
+  createCreative,
+  updateCreative,
+} from './controllers';
 
 /**
  * The Trade Desk API v3 Routes
@@ -67,5 +79,128 @@ router.put('/campaign/:id', validateTTDAuth, updateCampaign);
  * - TTD-Auth: {token}
  */
 router.get('/campaign/:id', validateTTDAuth, getCampaign);
+
+/**
+ * POST /ttd/v3/campaign/query/facets
+ * Query campaigns with facets (filters)
+ *
+ * Headers:
+ * - TTD-Auth: {token}
+ *
+ * Body:
+ * {
+ *   "AdvertiserIds": ["advertiser-1"],
+ *   "PageStartIndex": 0,
+ *   "PageSize": 100
+ * }
+ */
+router.post('/campaign/query/facets', validateTTDAuth, queryCampaignsFacets);
+
+/**
+ * GET /ttd/v3/myreports/reportexecution/query/campaign
+ * Get campaign reporting data
+ *
+ * Headers:
+ * - TTD-Auth: {token}
+ *
+ * Query Parameters:
+ * - AdvertiserIds: comma-separated list
+ * - StartDateInclusive: ISO 8601 date
+ * - EndDateExclusive: ISO 8601 date
+ * - PageStartIndex: number (optional)
+ * - PageSize: number (optional)
+ */
+router.get('/myreports/reportexecution/query/campaign', validateTTDAuth, getCampaignReporting);
+
+/**
+ * Ad Group endpoints (require TTD-Auth header)
+ */
+
+/**
+ * GET /ttd/v3/adgroup/:id
+ * Get ad group details
+ *
+ * Headers:
+ * - TTD-Auth: {token}
+ */
+router.get('/adgroup/:id', validateTTDAuth, getAdGroup);
+
+/**
+ * POST /ttd/v3/adgroup
+ * Create a new ad group
+ *
+ * Headers:
+ * - TTD-Auth: {token}
+ *
+ * Body:
+ * {
+ *   "AdGroupName": "Ad Group Name",
+ *   "CampaignId": "campaign_123",
+ *   "Budget": {
+ *     "Amount": 5000,
+ *     "CurrencyCode": "USD"
+ *   }
+ * }
+ */
+router.post('/adgroup', validateTTDAuth, createAdGroup);
+
+/**
+ * PUT /ttd/v3/adgroup/:id
+ * Update an existing ad group
+ *
+ * Headers:
+ * - TTD-Auth: {token}
+ *
+ * Body:
+ * {
+ *   "AdGroupName": "Updated Name",
+ *   "Availability": "Paused"
+ * }
+ */
+router.put('/adgroup/:id', validateTTDAuth, updateAdGroup);
+
+/**
+ * Creative endpoints (require TTD-Auth header)
+ */
+
+/**
+ * GET /ttd/v3/creative/:id
+ * Get creative details
+ *
+ * Headers:
+ * - TTD-Auth: {token}
+ */
+router.get('/creative/:id', validateTTDAuth, getCreative);
+
+/**
+ * POST /ttd/v3/creative
+ * Create a new creative
+ *
+ * Headers:
+ * - TTD-Auth: {token}
+ *
+ * Body:
+ * {
+ *   "CreativeName": "Creative Name",
+ *   "AdvertiserId": "advertiser_123",
+ *   "CreativeType": "ThirdPartyTag"
+ * }
+ */
+router.post('/creative', validateTTDAuth, createCreative);
+
+/**
+ * PUT /ttd/v3/creative/:id
+ * Update an existing creative
+ *
+ * Headers:
+ * - TTD-Auth: {token}
+ *
+ * Body:
+ * {
+ *   "CreativeName": "Updated Name",
+ *   "Availability": "Paused"
+ * }
+ */
+router.put('/creative/:id', validateTTDAuth, updateCreative);
 
 export default router;
