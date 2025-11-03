@@ -2,6 +2,10 @@
 
 Mock servers for testing campaign activation across 6 major advertising platforms using their latest API specifications (as of October 2025).
 
+**🚀 Production URL**: `https://mock-ad-servers.vercel.app`
+**📚 Swagger Docs**: `https://mock-ad-servers.vercel.app/api-docs`
+**⚡ Quick Start**: See [QUICK_START.md](./QUICK_START.md) for a 1-page developer guide with examples
+
 ## Supported Platforms
 
 | Platform | API Version | Auth Type | Status |
@@ -478,19 +482,26 @@ npx tsc --noEmit
 ✅ **TypeScript** - Fully typed with TypeScript for type safety
 ✅ **Middleware Support** - Logging, error handling, CORS, security headers
 ✅ **Configurable** - Easy configuration via environment variables
+✅ **Full CRUD Operations** - Create, Read, Update for campaigns, ad sets/groups, and ads
+✅ **Performance Metrics** - Insights, analytics, and reporting endpoints
+✅ **Advanced Queries** - GAQL support for Google Ads, filtering, and pagination
+✅ **Swagger Documentation** - Interactive API documentation with examples
+✅ **Production Deployment** - Deployed on Vercel with full test coverage (538 tests)
 
 ## Future Enhancements
 
 - 🔄 SQLite database for persistent storage
 - 🔄 Rate limiting with actual token bucket algorithm
 - 🔄 Webhook support for campaign status updates
-- 🔄 Additional campaign operations (list, search, delete)
-- 🔄 Support for ad groups and ads endpoints
-- 🔄 Advanced filtering and pagination
+- 🔄 Campaign deletion endpoints
+- 🔄 Budget pacing simulations
+- 🔄 Async report generation
 
 ## Documentation
 
-For detailed API specifications, see [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md)
+- **[QUICK_START.md](./QUICK_START.md)** - 1-page developer guide with examples and credentials
+- **[Swagger UI](https://mock-ad-servers.vercel.app/api-docs)** - Interactive API documentation
+- **[IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md)** - Detailed implementation specifications
 
 ## License
 
