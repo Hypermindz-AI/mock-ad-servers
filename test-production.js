@@ -7,7 +7,7 @@ const VALID_TOKENS = {
   meta: 'mock_meta_access_token_abcdef',
   linkedin: 'mock_linkedin_access_token_ghijkl',
   tiktok: 'mock_tiktok_access_token_mnopqr',
-  googleAds: 'mock_google_ads_access_token_stuvwx',
+  googleAds: 'mock_google_access_token_12345',
   dv360: 'mock_dv360_access_token_yzabcd',
   ttd: 'mock_ttd_token_stuvwx_yzabcd_efghij'
 };
