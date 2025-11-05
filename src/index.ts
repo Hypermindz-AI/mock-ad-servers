@@ -23,11 +23,54 @@ import tikTokRouter from './platforms/tiktok/routes.js';
 import tradeDeskRouter from './platforms/tradedesk/routes.js';
 import dv360Router from './platforms/dv360/routes.js';
 
+// Import admin routes
+import adminRouter from './routes/admin.js';
+
+// Import database utilities
+import { Database } from './db/database.js';
+import { seedAll } from './db/seeders/seedAll.js';
+
 // Load environment variables
 dotenv.config();
 
 // Initialize Express app
 const app: Application = express();
+
+// ============================================
+// Database Initialization (Async)
+// ============================================
+
+/**
+ * Initialize database on cold start
+ * Only runs if POSTGRES_URL is configured
+ */
+(async () => {
+  try {
+    // Check if Postgres is configured
+    if (process.env.POSTGRES_URL) {
+      console.log('🗄️  Initializing Vercel Postgres database...');
+
+      await Database.initialize();
+
+      // Check if database is empty and seed if needed
+      const isEmpty = await Database.isEmpty();
+      if (isEmpty) {
+        console.log('📝 Database is empty, running initial seed...');
+        await seedAll();
+      }
+
+      const stats = await Database.getStats();
+      console.log('✅ Database ready');
+      console.log(`   📊 ${stats.campaigns} campaigns, ${stats.adGroups} ad groups, ${stats.ads} ads`);
+    } else {
+      console.log('⚠️  POSTGRES_URL not configured, running in mock-only mode');
+      console.log('   Database features will be unavailable');
+    }
+  } catch (error) {
+    console.error('❌ Database initialization failed:', error);
+    console.error('   Application will continue in mock-only mode');
+  }
+})();
 
 // Security middleware
 // Configure helmet to allow Swagger UI to load from CDN
@@ -90,6 +133,15 @@ app.get('/', (_req, res) => {
       { platform: 'TikTok', baseUrl: '/tiktok/oauth' },
       { platform: 'The Trade Desk', baseUrl: '/ttd/v3/authentication (Token-based)' },
     ],
+    admin: {
+      info: '/admin/info',
+      endpoints: [
+        '/admin/health',
+        '/admin/stats',
+        '/admin/reset',
+        '/admin/seed'
+      ]
+    },
     documentation: '/api-docs',
   });
 });
@@ -198,6 +250,13 @@ app.use('/ttd/v3', tradeDeskRouter);
 
 // DV360 API v4
 app.use('/dv360/v4', dv360Router);
+
+// ============================================
+// Admin Routes
+// ============================================
+
+// Admin endpoints for database management
+app.use('/admin', adminRouter);
 
 // ============================================
 // Error Handling

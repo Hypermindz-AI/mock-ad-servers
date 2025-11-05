@@ -18,18 +18,21 @@ import {
   GoogleAdsMetrics,
 } from './mockData.js';
 import { parseGAQL, calculateDateRange, applyWhereConditions, selectFields } from './gaql-parser.js';
+import { CampaignRepository } from '../../db/repositories/CampaignRepository';
+import { MetricsRepository } from '../../db/repositories/MetricsRepository';
+import { MetricsGenerator } from '../../db/generators/MetricsGenerator';
 
-// In-memory storage for created campaigns
-const campaigns = new Map<string, GoogleAdsCampaign>();
+// Initialize repositories
+const campaignRepo = new CampaignRepository();
+const metricsRepo = new MetricsRepository();
 
-// In-memory storage for ad groups
+// In-memory storage for ad groups (not migrated yet)
 const adGroups = new Map<string, GoogleAdsAdGroup>();
 
-// In-memory storage for ad group ads
+// In-memory storage for ad group ads (not migrated yet)
 const adGroupAds = new Map<string, GoogleAdsAdGroupAd>();
 
 // Initialize with sample data
-campaigns.set('9876543210', sampleCampaign);
 adGroups.set('1111111111', sampleAdGroup);
 adGroupAds.set('1111111111~2222222222', sampleAdGroupAd);
 
@@ -67,7 +70,7 @@ function validateDeveloperToken(req: Request): boolean {
  * Create a new campaign
  * POST /googleads/v21/customers/:customerId/campaigns:mutate
  */
-export const createCampaign = (req: Request, res: Response): void => {
+export const createCampaign = async (req: Request, res: Response): Promise<void> => {
   // Validate Bearer token
   if (!validateBearerToken(req)) {
     res.status(401).json(authErrorResponse);
@@ -162,40 +165,73 @@ export const createCampaign = (req: Request, res: Response): void => {
     return;
   }
 
-  // Generate campaign ID
-  const campaignId = Math.floor(Math.random() * 9000000000 + 1000000000).toString();
-  const resourceName = `customers/${customerId}/campaigns/${campaignId}`;
+  try {
+    // Generate campaign ID
+    const campaignId = Math.floor(Math.random() * 9000000000 + 1000000000).toString();
+    const resourceName = `customers/${customerId}/campaigns/${campaignId}`;
 
-  // Create campaign object
-  const newCampaign: GoogleAdsCampaign = {
-    resourceName,
-    id: campaignId,
-    name: createData.name,
-    status: createData.status || 'PAUSED',
-    advertisingChannelType: createData.advertisingChannelType || 'SEARCH',
-    budget: createData.budget,
-    targetSpend: createData.targetSpend,
-  };
+    // Create campaign object
+    const newCampaign: GoogleAdsCampaign = {
+      resourceName,
+      id: campaignId,
+      name: createData.name,
+      status: createData.status || 'PAUSED',
+      advertisingChannelType: createData.advertisingChannelType || 'SEARCH',
+      budget: createData.budget,
+      targetSpend: createData.targetSpend,
+    };
 
-  // Store campaign
-  campaigns.set(campaignId, newCampaign);
-
-  // Return success response
-  res.status(200).json({
-    results: [
-      {
+    // Store campaign in database
+    await campaignRepo.create({
+      id: campaignId,
+      platform: 'google_ads',
+      account_id: customerId,
+      name: createData.name,
+      objective: createData.advertisingChannelType || 'SEARCH',
+      status: createData.status || 'PAUSED',
+      platform_specific_data: {
         resourceName,
-        campaign: newCampaign,
+        budget: createData.budget,
+        targetSpend: createData.targetSpend,
+      }
+    });
+
+    // Auto-generate 30 days of metrics
+    const metrics = MetricsGenerator.generateTimeSeries(
+      'google_ads',
+      'campaign',
+      campaignId,
+      100, // Default budget for metrics
+      30
+    );
+    await metricsRepo.createBatch(metrics);
+
+    // Return success response
+    res.status(200).json({
+      results: [
+        {
+          resourceName,
+          campaign: newCampaign,
+        },
+      ],
+    });
+  } catch (error) {
+    console.error('Error creating campaign:', error);
+    res.status(500).json({
+      error: {
+        code: 500,
+        message: 'Internal server error',
+        status: 'INTERNAL',
       },
-    ],
-  });
+    });
+  }
 };
 
 /**
  * Get campaign details
  * GET /googleads/v21/customers/:customerId/campaigns/:campaignId
  */
-export const getCampaign = (req: Request, res: Response): void => {
+export const getCampaign = async (req: Request, res: Response): Promise<void> => {
   // Validate Bearer token
   if (!validateBearerToken(req)) {
     res.status(401).json(authErrorResponse);
@@ -208,17 +244,39 @@ export const getCampaign = (req: Request, res: Response): void => {
     return;
   }
 
-  const { customerId: _customerId, campaignId } = req.params;
+  const { customerId, campaignId } = req.params;
 
-  // Check if campaign exists
-  const campaign = campaigns.get(campaignId);
-  if (!campaign) {
-    res.status(404).json(notFoundErrorResponse);
-    return;
+  try {
+    // Check if campaign exists in database
+    const dbCampaign = await campaignRepo.findById(campaignId);
+    if (!dbCampaign) {
+      res.status(404).json(notFoundErrorResponse);
+      return;
+    }
+
+    // Convert to Google Ads format
+    const campaign: GoogleAdsCampaign = {
+      resourceName: dbCampaign.platform_specific_data?.resourceName || `customers/${customerId}/campaigns/${campaignId}`,
+      id: dbCampaign.id,
+      name: dbCampaign.name,
+      status: dbCampaign.status,
+      advertisingChannelType: dbCampaign.objective || 'SEARCH',
+      budget: dbCampaign.platform_specific_data?.budget,
+      targetSpend: dbCampaign.platform_specific_data?.targetSpend,
+    };
+
+    // Return campaign details
+    res.status(200).json(campaign);
+  } catch (error) {
+    console.error('Error getting campaign:', error);
+    res.status(500).json({
+      error: {
+        code: 500,
+        message: 'Internal server error',
+        status: 'INTERNAL',
+      },
+    });
   }
-
-  // Return campaign details
-  res.status(200).json(campaign);
 };
 
 /**

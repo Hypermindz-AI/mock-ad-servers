@@ -1,0 +1,361 @@
+{
+  "description": "Example output from the data generators showing realistic mock campaign data",
+  "timestamp": "2025-11-05T16:10:00Z",
+
+  "campaigns": {
+    "meta": {
+      "id": "120212376843848",
+      "platform": "meta",
+      "account_id": "act_123456789",
+      "name": "Flash Sale 2026",
+      "objective": "OUTCOME_TRAFFIC",
+      "status": "ACTIVE",
+      "daily_budget": 7748.48,
+      "start_date": "2025-05-15T00:00:00Z",
+      "platform_specific_data": {
+        "special_ad_categories": ["CREDIT"],
+        "buying_type": "AUCTION",
+        "bid_strategy": "LOWEST_COST_WITH_BID_CAP"
+      }
+    },
+    "google_ads": {
+      "id": "2376843853",
+      "platform": "google_ads",
+      "account_id": "cus_123456789",
+      "name": "Black Friday 2026",
+      "objective": "SEARCH",
+      "status": "ACTIVE",
+      "daily_budget": 3757.31,
+      "start_date": "2025-04-22T00:00:00Z",
+      "platform_specific_data": {
+        "advertising_channel_type": "SEARCH",
+        "bidding_strategy": "TARGET_CPA"
+      }
+    },
+    "linkedin": {
+      "id": "urn:li:sponsoredCampaign:17623768438536241",
+      "platform": "linkedin",
+      "account_id": "urn:li:organization:123456",
+      "name": "Summer Campaign 2026",
+      "objective": "VIDEO_ADS",
+      "status": "PAUSED",
+      "lifetime_budget": 201544.01,
+      "start_date": "2025-03-10T00:00:00Z",
+      "end_date": "2026-01-15T00:00:00Z",
+      "platform_specific_data": {
+        "campaign_group": "urn:li:sponsoredCampaignGroup:789012",
+        "locale": "en_US"
+      }
+    }
+  },
+
+  "ad_groups": [
+    {
+      "id": "238472376843855",
+      "platform": "meta",
+      "campaign_id": "120212376843848",
+      "name": "iOS - All Genders",
+      "status": "ACTIVE",
+      "optimization_goal": "VALUE",
+      "bid_amount": 28.33,
+      "daily_budget": 500.00,
+      "targeting": {
+        "age_range": { "min": 25, "max": 34 },
+        "genders": ["MALE", "FEMALE"],
+        "devices": ["MOBILE"],
+        "locations": ["US"],
+        "languages": ["en"],
+        "detailed_targeting": {
+          "interests": ["Technology", "Fashion"],
+          "behaviors": ["Digital activities"]
+        },
+        "placement_types": ["feed", "story", "reels"]
+      },
+      "platform_specific_data": {
+        "attribution_spec": [
+          { "event_type": "CLICK_THROUGH", "window_days": 7 },
+          { "event_type": "VIEW_THROUGH", "window_days": 1 }
+        ],
+        "destination_type": "WEBSITE"
+      }
+    },
+    {
+      "id": "23768438575730",
+      "platform": "google_ads",
+      "campaign_id": "2376843853",
+      "name": "Desktop - 35-44",
+      "status": "ACTIVE",
+      "optimization_goal": "MAXIMIZE_CONVERSIONS",
+      "bid_amount": 12.50,
+      "targeting": {
+        "age_range": { "min": 35, "max": 44 },
+        "genders": ["ALL"],
+        "devices": ["DESKTOP"],
+        "locations": ["US", "CA"],
+        "languages": ["en"],
+        "keywords": [
+          "buy shoes online",
+          "best running shoes",
+          "athletic footwear",
+          "discount shoes"
+        ],
+        "match_types": ["EXACT", "PHRASE", "BROAD"]
+      },
+      "platform_specific_data": {
+        "ad_rotation_mode": "OPTIMIZE",
+        "target_cpa": 25.00
+      }
+    }
+  ],
+
+  "ads": [
+    {
+      "id": "23768438572231",
+      "platform": "google_ads",
+      "campaign_id": "2376843853",
+      "ad_group_id": "23768438575730",
+      "name": "Dynamic Ad - Test",
+      "status": "ACTIVE",
+      "creative_data": {
+        "headline": "Get Started in Minutes",
+        "description": "Experience the difference with our premium solution. Trusted by industry leaders.",
+        "call_to_action": "Learn More",
+        "destination_url": "https://example-store.com",
+        "display_url": "example-store.com",
+        "responsive_search_ad": {
+          "headlines": [
+            "Get Started in Minutes",
+            "Transform Your Business Now",
+            "Join Thousands of Happy Customers",
+            "Limited Time Offer - Save Big Today",
+            "Discover Your Perfect Solution"
+          ],
+          "descriptions": [
+            "Experience the difference with our premium solution. Trusted by industry leaders.",
+            "Get started today and see results fast. No credit card required.",
+            "Industry-leading features at unbeatable prices. See why customers love us."
+          ],
+          "path1": "products",
+          "path2": "buy"
+        }
+      },
+      "platform_specific_data": {
+        "tracking_url_template": "{lpurl}?utm_source=google&utm_medium=cpc&utm_campaign={campaignid}",
+        "final_url_suffix": "gclid={gclid}",
+        "policy_summary": {
+          "approval_status": "APPROVED",
+          "review_status": "REVIEWED"
+        }
+      }
+    },
+    {
+      "id": "23849238472376843855",
+      "platform": "meta",
+      "campaign_id": "120212376843848",
+      "ad_group_id": "238472376843855",
+      "name": "Image Ad - V1",
+      "status": "ACTIVE",
+      "creative_data": {
+        "headline": "Limited Time Offer - Save Big Today",
+        "description": "Take your business to the next level. Try free for 30 days.",
+        "call_to_action": "Shop Now",
+        "destination_url": "https://example-store.com/sale",
+        "display_url": "example-store.com",
+        "object_story_spec": {
+          "page_id": "123456789012",
+          "link_data": {
+            "image_url": "https://images.example.com/ad-creative-001.jpg",
+            "link": "https://example-store.com/sale",
+            "message": "Don't miss our biggest sale of the year!",
+            "name": "Limited Time Offer - Save Big Today",
+            "description": "Up to 50% off on all products"
+          }
+        },
+        "asset_feed_spec": {
+          "images": [
+            {
+              "url": "https://images.example.com/ad-creative-001.jpg",
+              "hash": "abc123def456ghi789jkl012mno345pq"
+            },
+            {
+              "url": "https://images.example.com/ad-creative-002.jpg",
+              "hash": "xyz987wvu654tsr321qpo098nml765kj"
+            }
+          ],
+          "videos": []
+        }
+      },
+      "platform_specific_data": {
+        "tracking_specs": [
+          {
+            "action_type": ["offsite_conversion"],
+            "fb_pixel": ["1234567890123"]
+          }
+        ],
+        "url_tags": "utm_source=facebook&utm_medium=cpc&utm_campaign=flash_sale"
+      }
+    }
+  ],
+
+  "metrics": {
+    "daily": [
+      {
+        "platform": "linkedin",
+        "entity_type": "campaign",
+        "entity_id": "urn:li:sponsoredCampaign:17623768438536241",
+        "date": "2025-10-29",
+        "impressions": 46570,
+        "clicks": 536,
+        "spend": 1390.12,
+        "conversions": 9,
+        "ctr": 1.15,
+        "cpc": 2.59,
+        "cpm": 29.85
+      },
+      {
+        "platform": "linkedin",
+        "entity_type": "campaign",
+        "entity_id": "urn:li:sponsoredCampaign:17623768438536241",
+        "date": "2025-10-30",
+        "impressions": 73520,
+        "clicks": 962,
+        "spend": 2281.35,
+        "conversions": 45,
+        "ctr": 1.31,
+        "cpc": 2.37,
+        "cpm": 31.03
+      },
+      {
+        "platform": "linkedin",
+        "entity_type": "campaign",
+        "entity_id": "urn:li:sponsoredCampaign:17623768438536241",
+        "date": "2025-10-31",
+        "impressions": 37180,
+        "clicks": 518,
+        "spend": 1490.21,
+        "conversions": 38,
+        "ctr": 1.39,
+        "cpc": 2.88,
+        "cpm": 40.08
+      }
+    ],
+    "aggregated_7_days": {
+      "total_impressions": 358911,
+      "total_clicks": 3941,
+      "total_spend": 14005.38,
+      "total_conversions": 182,
+      "avg_ctr": 1.10,
+      "avg_cpc": 3.55,
+      "avg_cpm": 39.02
+    }
+  },
+
+  "campaign_hierarchy_example": {
+    "campaign": {
+      "id": "17623768439975181",
+      "name": "Loyalty Program 2026",
+      "platform": "tiktok",
+      "status": "PAUSED",
+      "objective": "APP_PROMOTION",
+      "daily_budget": 7307.03
+    },
+    "ad_groups": [
+      {
+        "id": "17623768439977712",
+        "name": "25-34 - 35-44",
+        "status": "ACTIVE",
+        "optimization_goal": "REACH",
+        "bid_amount": 48.10,
+        "ads": [
+          { "id": "17623768439985017", "name": "Collection Ad - Test", "status": "ACTIVE" },
+          { "id": "17623768439981765", "name": "Image Ad - C", "status": "ACTIVE" },
+          { "id": "17623768439989844", "name": "Story Ad - B", "status": "ACTIVE" },
+          { "id": "17623768439981403", "name": "Collection Ad - B", "status": "ACTIVE" },
+          { "id": "17623768439999546", "name": "Display Ad - V1", "status": "ACTIVE" }
+        ]
+      },
+      {
+        "id": "17623768439971250",
+        "name": "25-34 - Android",
+        "status": "ACTIVE",
+        "optimization_goal": "REACH",
+        "bid_amount": 15.49,
+        "ads": [
+          { "id": "17623768439993697", "name": "Image Ad - Test", "status": "DRAFT" },
+          { "id": "17623768439994021", "name": "Video Ad - Test", "status": "PAUSED" },
+          { "id": "17623768439997479", "name": "Carousel Ad - D", "status": "ACTIVE" }
+        ]
+      },
+      {
+        "id": "17623768439972636",
+        "name": "Canada - 55+",
+        "status": "ACTIVE",
+        "optimization_goal": "VIDEO_VIEW",
+        "bid_amount": 46.77,
+        "ads": [
+          { "id": "17623768439996389", "name": "Collection Ad - Test", "status": "ACTIVE" },
+          { "id": "17623768439992037", "name": "Carousel Ad - B", "status": "PAUSED" }
+        ]
+      }
+    ],
+    "summary": {
+      "total_campaigns": 1,
+      "total_ad_groups": 3,
+      "total_ads": 10
+    }
+  },
+
+  "status_distribution_test": {
+    "sample_size": 100,
+    "results": {
+      "ACTIVE": 63,
+      "PAUSED": 28,
+      "DRAFT": 9
+    },
+    "expected": {
+      "ACTIVE": 60,
+      "PAUSED": 30,
+      "DRAFT": 10
+    },
+    "validation": "PASSED"
+  },
+
+  "platform_id_formats": {
+    "meta": {
+      "campaign": "120212376843999",
+      "ad_group": "238472376843999",
+      "ad": "238492376843999",
+      "format": "Numeric with platform prefix"
+    },
+    "google_ads": {
+      "campaign": "2376844000",
+      "ad_group": "23768440006303",
+      "ad": "23768440002559",
+      "format": "Pure numeric"
+    },
+    "linkedin": {
+      "campaign": "urn:li:sponsoredCampaign:17623768440008135",
+      "ad_group": "urn:li:sponsoredCampaignGroup:17623768440006330",
+      "ad": "urn:li:sponsoredCreative:17623768440009731",
+      "format": "URN (Uniform Resource Name)"
+    },
+    "tiktok": {
+      "campaign": "17623768440009277",
+      "ad_group": "17623768440009152",
+      "ad": "17623768440009882",
+      "format": "Pure numeric"
+    },
+    "tradedesk": {
+      "campaign": "ttd_campaign_1762376844000",
+      "ad_group": "ttd_adgroup_1762376844000",
+      "ad": "ttd_ad_1762376844000",
+      "format": "Prefixed string"
+    },
+    "dv360": {
+      "campaign": "17623768440009724",
+      "ad_group": "17623768440008295",
+      "ad": "17623768440006661",
+      "format": "Pure numeric"
+    }
+  }
+}

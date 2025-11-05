@@ -17,6 +17,13 @@ import {
   validOptimizationGoals,
   generateInsightsData,
 } from './mockData';
+import { CampaignRepository } from '../../db/repositories/CampaignRepository';
+import { MetricsRepository } from '../../db/repositories/MetricsRepository';
+import { MetricsGenerator } from '../../db/generators/MetricsGenerator';
+
+// Initialize repositories
+const campaignRepo = new CampaignRepository();
+const metricsRepo = new MetricsRepository();
 
 /**
  * Create Campaign
@@ -26,7 +33,7 @@ import {
  * Required fields: name, objective, status
  * Optional fields: daily_budget, lifetime_budget, special_ad_categories
  */
-export const createCampaign = (req: Request, res: Response): void => {
+export const createCampaign = async (req: Request, res: Response): Promise<void> => {
   const {
     name,
     objective,
@@ -35,6 +42,7 @@ export const createCampaign = (req: Request, res: Response): void => {
     lifetime_budget,
     special_ad_categories,
   } = req.body;
+  const { adAccountId } = req.params;
 
   // Validate required fields
   if (!name) {
@@ -128,35 +136,59 @@ export const createCampaign = (req: Request, res: Response): void => {
     });
   }
 
-  // Generate campaign ID
-  const campaignId = generateCampaignId();
-  const timestamp = new Date().toISOString().replace(/\.\d{3}Z$/, '+0000');
+  try {
+    // Generate campaign ID
+    const campaignId = generateCampaignId();
+    const timestamp = new Date().toISOString().replace(/\.\d{3}Z$/, '+0000');
 
-  // Create campaign object
-  const campaign: MetaCampaign = {
-    id: campaignId,
-    name,
-    objective,
-    status,
-    ...(daily_budget && { daily_budget }),
-    ...(lifetime_budget && { lifetime_budget }),
-    special_ad_categories: special_ad_categories || [],
-    created_time: timestamp,
-    updated_time: timestamp,
-  };
+    // Create campaign in database
+    await campaignRepo.create({
+      id: campaignId,
+      platform: 'meta',
+      account_id: adAccountId || 'default',
+      name,
+      objective,
+      status,
+      daily_budget,
+      lifetime_budget,
+      platform_specific_data: {
+        special_ad_categories: special_ad_categories || [],
+        created_time: timestamp,
+        updated_time: timestamp,
+      }
+    });
 
-  // Store campaign
-  campaignStorage.set(campaignId, campaign);
+    // Auto-generate 30 days of metrics
+    const budget = daily_budget || (lifetime_budget ? lifetime_budget / 30 : 100);
+    const metrics = MetricsGenerator.generateTimeSeries(
+      'meta',
+      'campaign',
+      campaignId,
+      budget,
+      30
+    );
+    await metricsRepo.createBatch(metrics);
 
-  // Return success response
-  res.status(200).json({
-    id: campaignId,
-    name,
-    status,
-    objective,
-    ...(daily_budget && { daily_budget }),
-    ...(lifetime_budget && { lifetime_budget }),
-  });
+    // Return success response
+    res.status(200).json({
+      id: campaignId,
+      name,
+      status,
+      objective,
+      ...(daily_budget && { daily_budget }),
+      ...(lifetime_budget && { lifetime_budget }),
+    });
+  } catch (error) {
+    console.error('Error creating campaign:', error);
+    res.status(500).json({
+      error: {
+        message: 'Internal server error',
+        type: 'OAuthException',
+        code: 500,
+        fbtrace_id: generateFbTraceId(),
+      },
+    });
+  }
 };
 
 /**
@@ -165,25 +197,50 @@ export const createCampaign = (req: Request, res: Response): void => {
  *
  * Retrieves campaign details by ID
  */
-export const getCampaign = (req: Request, res: Response): void => {
+export const getCampaign = async (req: Request, res: Response): Promise<void> => {
   const { campaignId } = req.params;
 
-  // Retrieve campaign from storage
-  const campaign = campaignStorage.get(campaignId);
+  try {
+    // Retrieve campaign from database
+    const dbCampaign = await campaignRepo.findById(campaignId);
 
-  if (!campaign) {
-    return void res.status(404).json({
+    if (!dbCampaign) {
+      return void res.status(404).json({
+        error: {
+          message: `Campaign with ID ${campaignId} not found`,
+          type: 'OAuthException',
+          code: 100,
+          fbtrace_id: generateFbTraceId(),
+        },
+      });
+    }
+
+    // Convert to Meta format
+    const campaign: MetaCampaign = {
+      id: dbCampaign.id,
+      name: dbCampaign.name,
+      objective: dbCampaign.objective || '',
+      status: dbCampaign.status,
+      ...(dbCampaign.daily_budget && { daily_budget: dbCampaign.daily_budget }),
+      ...(dbCampaign.lifetime_budget && { lifetime_budget: dbCampaign.lifetime_budget }),
+      special_ad_categories: dbCampaign.platform_specific_data?.special_ad_categories || [],
+      created_time: dbCampaign.platform_specific_data?.created_time || dbCampaign.created_at?.toISOString().replace(/\.\d{3}Z$/, '+0000'),
+      updated_time: dbCampaign.platform_specific_data?.updated_time || dbCampaign.updated_at?.toISOString().replace(/\.\d{3}Z$/, '+0000'),
+    };
+
+    // Return campaign details
+    res.status(200).json(campaign);
+  } catch (error) {
+    console.error('Error getting campaign:', error);
+    res.status(500).json({
       error: {
-        message: `Campaign with ID ${campaignId} not found`,
+        message: 'Internal server error',
         type: 'OAuthException',
-        code: 100,
+        code: 500,
         fbtrace_id: generateFbTraceId(),
       },
     });
   }
-
-  // Return campaign details
-  res.status(200).json(campaign);
 };
 
 /**
@@ -193,90 +250,103 @@ export const getCampaign = (req: Request, res: Response): void => {
  * Updates an existing campaign
  * Supports updating: name, status, daily_budget, lifetime_budget
  */
-export const updateCampaign = (req: Request, res: Response): void => {
+export const updateCampaign = async (req: Request, res: Response): Promise<void> => {
   const { campaignId } = req.params;
   const updates = req.body;
 
-  // Retrieve existing campaign
-  const campaign = campaignStorage.get(campaignId);
+  try {
+    // Retrieve existing campaign
+    const campaign = await campaignRepo.findById(campaignId);
 
-  if (!campaign) {
-    return void res.status(404).json({
+    if (!campaign) {
+      return void res.status(404).json({
+        error: {
+          message: `Campaign with ID ${campaignId} not found`,
+          type: 'OAuthException',
+          code: 100,
+          fbtrace_id: generateFbTraceId(),
+        },
+      });
+    }
+
+    // Validate status if provided
+    if (updates.status && !validStatuses.includes(updates.status)) {
+      return void res.status(400).json({
+        error: {
+          message: `Invalid status. Must be one of: ${validStatuses.join(', ')}`,
+          type: 'OAuthException',
+          code: 100,
+          fbtrace_id: generateFbTraceId(),
+        },
+      });
+    }
+
+    // Validate objective if provided
+    if (updates.objective && !validObjectives.includes(updates.objective)) {
+      return void res.status(400).json({
+        error: {
+          message: `Invalid objective. Must be one of: ${validObjectives.join(', ')}`,
+          type: 'OAuthException',
+          code: 100,
+          fbtrace_id: generateFbTraceId(),
+        },
+      });
+    }
+
+    // Validate daily_budget if provided
+    if (updates.daily_budget && (typeof updates.daily_budget !== 'number' || updates.daily_budget <= 0)) {
+      return void res.status(400).json({
+        error: {
+          message: 'Invalid daily_budget. Must be a positive number',
+          type: 'OAuthException',
+          code: 100,
+          fbtrace_id: generateFbTraceId(),
+        },
+      });
+    }
+
+    // Validate lifetime_budget if provided
+    if (updates.lifetime_budget && (typeof updates.lifetime_budget !== 'number' || updates.lifetime_budget <= 0)) {
+      return void res.status(400).json({
+        error: {
+          message: 'Invalid lifetime_budget. Must be a positive number',
+          type: 'OAuthException',
+          code: 100,
+          fbtrace_id: generateFbTraceId(),
+        },
+      });
+    }
+
+    // Update campaign in database
+    await campaignRepo.update(campaignId, {
+      name: updates.name,
+      status: updates.status,
+      objective: updates.objective,
+      daily_budget: updates.daily_budget,
+      lifetime_budget: updates.lifetime_budget,
+      platform_specific_data: {
+        ...campaign.platform_specific_data,
+        updated_time: new Date().toISOString().replace(/\.\d{3}Z$/, '+0000'),
+      }
+    });
+
+    // Return success response
+    res.status(200).json({
+      success: true,
+      id: campaignId,
+      ...updates,
+    });
+  } catch (error) {
+    console.error('Error updating campaign:', error);
+    res.status(500).json({
       error: {
-        message: `Campaign with ID ${campaignId} not found`,
+        message: 'Internal server error',
         type: 'OAuthException',
-        code: 100,
+        code: 500,
         fbtrace_id: generateFbTraceId(),
       },
     });
   }
-
-  // Validate status if provided
-  if (updates.status && !validStatuses.includes(updates.status)) {
-    return void res.status(400).json({
-      error: {
-        message: `Invalid status. Must be one of: ${validStatuses.join(', ')}`,
-        type: 'OAuthException',
-        code: 100,
-        fbtrace_id: generateFbTraceId(),
-      },
-    });
-  }
-
-  // Validate objective if provided
-  if (updates.objective && !validObjectives.includes(updates.objective)) {
-    return void res.status(400).json({
-      error: {
-        message: `Invalid objective. Must be one of: ${validObjectives.join(', ')}`,
-        type: 'OAuthException',
-        code: 100,
-        fbtrace_id: generateFbTraceId(),
-      },
-    });
-  }
-
-  // Validate daily_budget if provided
-  if (updates.daily_budget && (typeof updates.daily_budget !== 'number' || updates.daily_budget <= 0)) {
-    return void res.status(400).json({
-      error: {
-        message: 'Invalid daily_budget. Must be a positive number',
-        type: 'OAuthException',
-        code: 100,
-        fbtrace_id: generateFbTraceId(),
-      },
-    });
-  }
-
-  // Validate lifetime_budget if provided
-  if (updates.lifetime_budget && (typeof updates.lifetime_budget !== 'number' || updates.lifetime_budget <= 0)) {
-    return void res.status(400).json({
-      error: {
-        message: 'Invalid lifetime_budget. Must be a positive number',
-        type: 'OAuthException',
-        code: 100,
-        fbtrace_id: generateFbTraceId(),
-      },
-    });
-  }
-
-  // Update campaign
-  const updatedCampaign: MetaCampaign = {
-    ...campaign,
-    ...updates,
-    id: campaign.id, // Preserve ID
-    created_time: campaign.created_time, // Preserve creation time
-    updated_time: new Date().toISOString().replace(/\.\d{3}Z$/, '+0000'),
-  };
-
-  // Store updated campaign
-  campaignStorage.set(campaignId, updatedCampaign);
-
-  // Return success response
-  res.status(200).json({
-    success: true,
-    id: campaignId,
-    ...updates,
-  });
 };
 
 /**
@@ -285,50 +355,76 @@ export const updateCampaign = (req: Request, res: Response): void => {
  *
  * Lists all campaigns for an ad account with optional pagination
  */
-export const listCampaigns = (req: Request, res: Response): void => {
+export const listCampaigns = async (req: Request, res: Response): Promise<void> => {
   const { fields, limit, after } = req.query;
+  const { adAccountId } = req.params;
 
-  // Get all campaigns
-  const allCampaigns = Array.from(campaignStorage.values());
+  try {
+    // Get all campaigns from database for this account
+    const dbCampaigns = await campaignRepo.findByAccountId('meta', adAccountId || 'default');
 
-  // Parse limit
-  const limitNum = limit ? parseInt(limit as string, 10) : 25;
-  const startIndex = after ? parseInt(after as string, 10) || 0 : 0;
+    // Convert to Meta format
+    const allCampaigns: MetaCampaign[] = dbCampaigns.map(dbCampaign => ({
+      id: dbCampaign.id,
+      name: dbCampaign.name,
+      objective: dbCampaign.objective || '',
+      status: dbCampaign.status,
+      ...(dbCampaign.daily_budget && { daily_budget: dbCampaign.daily_budget }),
+      ...(dbCampaign.lifetime_budget && { lifetime_budget: dbCampaign.lifetime_budget }),
+      special_ad_categories: dbCampaign.platform_specific_data?.special_ad_categories || [],
+      created_time: dbCampaign.platform_specific_data?.created_time || dbCampaign.created_at?.toISOString().replace(/\.\d{3}Z$/, '+0000'),
+      updated_time: dbCampaign.platform_specific_data?.updated_time || dbCampaign.updated_at?.toISOString().replace(/\.\d{3}Z$/, '+0000'),
+    }));
 
-  // Paginate
-  const endIndex = startIndex + limitNum;
-  const paginatedCampaigns = allCampaigns.slice(startIndex, endIndex);
+    // Parse limit
+    const limitNum = limit ? parseInt(limit as string, 10) : 25;
+    const startIndex = after ? parseInt(after as string, 10) || 0 : 0;
 
-  // Filter fields if specified
-  let responseData = paginatedCampaigns;
-  if (fields) {
-    const fieldArray = (fields as string).split(',');
-    responseData = paginatedCampaigns.map((campaign) => {
-      const filtered: any = { id: campaign.id }; // Always include ID
-      fieldArray.forEach((field) => {
-        if (field in campaign) {
-          filtered[field] = campaign[field as keyof MetaCampaign];
-        }
+    // Paginate
+    const endIndex = startIndex + limitNum;
+    const paginatedCampaigns = allCampaigns.slice(startIndex, endIndex);
+
+    // Filter fields if specified
+    let responseData = paginatedCampaigns;
+    if (fields) {
+      const fieldArray = (fields as string).split(',');
+      responseData = paginatedCampaigns.map((campaign) => {
+        const filtered: any = { id: campaign.id }; // Always include ID
+        fieldArray.forEach((field) => {
+          if (field in campaign) {
+            filtered[field] = campaign[field as keyof MetaCampaign];
+          }
+        });
+        return filtered;
       });
-      return filtered;
+    }
+
+    // Build pagination response
+    const response: any = {
+      data: responseData,
+    };
+
+    if (allCampaigns.length > endIndex) {
+      response.paging = {
+        cursors: {
+          before: generateCursor(),
+          after: endIndex.toString(),
+        },
+      };
+    }
+
+    res.status(200).json(response);
+  } catch (error) {
+    console.error('Error listing campaigns:', error);
+    res.status(500).json({
+      error: {
+        message: 'Internal server error',
+        type: 'OAuthException',
+        code: 500,
+        fbtrace_id: generateFbTraceId(),
+      },
     });
   }
-
-  // Build pagination response
-  const response: any = {
-    data: responseData,
-  };
-
-  if (allCampaigns.length > endIndex) {
-    response.paging = {
-      cursors: {
-        before: generateCursor(),
-        after: endIndex.toString(),
-      },
-    };
-  }
-
-  res.status(200).json(response);
 };
 
 /**
