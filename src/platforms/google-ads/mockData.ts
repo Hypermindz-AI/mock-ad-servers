@@ -49,22 +49,22 @@ export interface GoogleAdsErrorResponse {
 
 // Sample campaign object
 export const sampleCampaign: GoogleAdsCampaign = {
-  resourceName: 'customers/1234567890/campaigns/9876543210',
+  resourceName: 'customers/adv_0024160a/campaigns/camp_43d1f819',
   name: 'Sample Search Campaign',
   status: 'ENABLED',
   advertisingChannelType: 'SEARCH',
-  budget: 'customers/1234567890/campaignBudgets/1111111111',
+  budget: 'customers/adv_0024160a/campaignBudgets/1111111111',
   targetSpend: {
     targetSpendMicros: '10000000', // $10 in micros
   },
-  id: '9876543210',
+  id: 'camp_43d1f819',
 };
 
 // Success response for campaign creation
 export const successCampaignResponse: GoogleAdsSuccessResponse = {
   results: [
     {
-      resourceName: 'customers/1234567890/campaigns/9876543210',
+      resourceName: 'customers/adv_0024160a/campaigns/camp_43d1f819',
       campaign: sampleCampaign,
     },
   ],
@@ -74,7 +74,7 @@ export const successCampaignResponse: GoogleAdsSuccessResponse = {
 export const successUpdateResponse: GoogleAdsSuccessResponse = {
   results: [
     {
-      resourceName: 'customers/1234567890/campaigns/9876543210',
+      resourceName: 'customers/adv_0024160a/campaigns/camp_43d1f819',
     },
   ],
 };
@@ -380,12 +380,32 @@ export interface GoogleAdsSearchResponse {
   fieldMask?: string;
 }
 
+// Customer (account) types
+export interface GoogleAdsCustomer {
+  resourceName: string;
+  id: string;
+  descriptiveName?: string;
+  currencyCode?: string;
+  timeZone?: string;
+  status: 'ENABLED' | 'SUSPENDED' | 'CANCELLED' | 'UNSPECIFIED';
+}
+
+// Optional: seed a sample customer for convenience
+export const sampleCustomer: GoogleAdsCustomer = {
+  resourceName: 'customers/adv_0024160a',
+  id: 'adv_0024160a',
+  descriptiveName: 'Sample Customer',
+  currencyCode: 'USD',
+  timeZone: 'America/Los_Angeles',
+  status: 'ENABLED',
+};
+
 // Sample ad group
 export const sampleAdGroup: GoogleAdsAdGroup = {
-  resourceName: 'customers/1234567890/adGroups/1111111111',
+  resourceName: 'customers/adv_0024160a/adGroups/1111111111',
   id: '1111111111',
   name: 'Sample Ad Group',
-  campaign: 'customers/1234567890/campaigns/9876543210',
+  campaign: 'customers/adv_0024160a/campaigns/camp_43d1f819',
   status: 'ENABLED',
   type: 'SEARCH_STANDARD',
   cpcBidMicros: '1000000', // $1 in micros
@@ -393,9 +413,9 @@ export const sampleAdGroup: GoogleAdsAdGroup = {
 
 // Sample ad group ad
 export const sampleAdGroupAd: GoogleAdsAdGroupAd = {
-  resourceName: 'customers/1234567890/adGroupAds/1111111111~2222222222',
+  resourceName: 'customers/adv_0024160a/adGroupAds/1111111111~2222222222',
   id: '2222222222',
-  adGroup: 'customers/1234567890/adGroups/1111111111',
+  adGroup: 'customers/adv_0024160a/adGroups/1111111111',
   status: 'ENABLED',
   ad: {
     id: '2222222222',
