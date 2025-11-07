@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   createCampaign,
   getCampaign,
+  getCustomer,
   updateCampaignStatus,
   searchGoogleAds,
   mutateAdGroups,
@@ -14,6 +15,24 @@ const router = Router();
  * Google Ads API v21 Routes
  * Base path: /googleads/v21
  */
+
+/**
+ * Get Customer (Account) Endpoint
+ * GET /googleads/v21/customers/:customerId
+ *
+ * Required Headers:
+ * - Authorization: Bearer {token}
+ * - developer-token: {dev_token}
+ *
+ * Response:
+ * {
+ *   "resourceName": "customers/{customerId}",
+ *   "id": "{customerId}",
+ *   "descriptiveName": "Customer {customerId}",
+ *   "status": "ENABLED"
+ * }
+ */
+router.get('/account_status/customers/:customerId', getCustomer);
 
 /**
  * Campaign Mutate Endpoint (Create/Update)
@@ -49,14 +68,16 @@ const router = Router();
  */
 router.post('/customers/:customerId/campaigns:mutate', (req, res) => {
   const { operations } = req.body;
-
+  console.log('1', req.body)
   // Determine if this is a create or update operation
   if (operations && operations.length > 0) {
     const operation = operations[0];
 
     if (operation.create) {
+      console.log('Creating campaign with data:', operation.create);
       createCampaign(req, res);
     } else if (operation.update) {
+      console.log('Updating campaign with data:', operation.update);
       updateCampaignStatus(req, res);
     } else {
       res.status(400).json({
