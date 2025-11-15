@@ -12,6 +12,8 @@ export interface GeneratedAd {
 }
 
 export class AdGenerator {
+  private static idCounter = 0;
+
   /**
    * Generate realistic ad name
    */
@@ -65,34 +67,35 @@ export class AdGenerator {
   private static generateId(platform: string): string {
     const timestamp = Date.now();
     const random = faker.number.int({ min: 1000, max: 9999 });
+    const counter = ++this.idCounter;
 
     switch (platform) {
       case 'meta':
-        // Meta ads start with 23849...
-        return `23849${timestamp.toString().slice(-10)}`;
+        // Meta ads start with 23849... (add random for uniqueness)
+        return `23849${timestamp.toString().slice(-10)}${random}${counter}`;
 
       case 'google_ads':
         // Google Ads uses numeric IDs
-        return `${timestamp.toString().slice(-10)}${random}`;
+        return `${timestamp.toString().slice(-10)}${random}${counter}`;
 
       case 'linkedin':
         // LinkedIn uses URN format
-        return `urn:li:sponsoredCreative:${timestamp}${random}`;
+        return `urn:li:sponsoredCreative:${timestamp}${random}${counter}`;
 
       case 'tiktok':
         // TikTok uses numeric IDs
-        return `${timestamp}${random}`;
+        return `${timestamp}${random}${counter}`;
 
       case 'tradedesk':
-        // Trade Desk uses prefixed format
-        return `ttd_ad_${timestamp}`;
+        // Trade Desk uses prefixed format (add random for uniqueness)
+        return `ttd_ad_${timestamp}${random}${counter}`;
 
       case 'dv360':
         // DV360 uses numeric IDs (line item)
-        return `${timestamp}${random}`;
+        return `${timestamp}${random}${counter}`;
 
       default:
-        return `${platform}_ad_${timestamp}${random}`;
+        return `${platform}_ad_${timestamp}${random}${counter}`;
     }
   }
 

@@ -798,15 +798,15 @@ describe('Google Ads API v21 - Campaign CRUD Tests', () => {
     });
 
     it('should retrieve the pre-existing sample campaign', async () => {
-      const sampleCampaignId = '9876543210';
+      const sampleCampaignId = 'camp_43d1f819'; // Updated to match current mockData
       const response = await request(app)
         .get(`/googleads/v21/customers/${TEST_CUSTOMER_ID}/campaigns/${sampleCampaignId}`)
         .set(validHeaders);
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('id', sampleCampaignId);
-      expect(response.body).toHaveProperty('name');
-      expect(response.body).toHaveProperty('status');
+      expect(response.body).toHaveProperty('name', 'Sample Search Campaign');
+      expect(response.body).toHaveProperty('status', 'ENABLED');
     });
 
     it('should return 404 for non-existent campaign', async () => {

@@ -17,6 +17,14 @@ import {
   validOptimizationGoals,
   generateInsightsData,
 } from './mockData';
+// Database imports - reserved for future Postgres integration
+// import { CampaignRepository } from '../../db/repositories/CampaignRepository';
+// import { MetricsRepository } from '../../db/repositories/MetricsRepository';
+// import { MetricsGenerator } from "../../db/generators/metricsGenerator";
+
+// Initialize repositories (reserved for Postgres integration)
+// const campaignRepo = new CampaignRepository();
+// const metricsRepo = new MetricsRepository();
 
 /**
  * Create Campaign

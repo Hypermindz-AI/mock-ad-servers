@@ -20,6 +20,10 @@ import {
   sampleCustomer,
 } from './mockData.js';
 import { parseGAQL, calculateDateRange, applyWhereConditions, selectFields } from './gaql-parser.js';
+// Database imports - reserved for future Postgres integration
+// import { CampaignRepository } from '../../db/repositories/CampaignRepository';
+// import { MetricsRepository } from '../../db/repositories/MetricsRepository';
+// import { MetricsGenerator } from "../../db/generators/metricsGenerator";
 
 // In-memory storage for created campaigns
 const campaigns = new Map<string, GoogleAdsCampaign>();
@@ -34,7 +38,7 @@ const adGroupAds = new Map<string, GoogleAdsAdGroupAd>();
 const customers = new Map<string, GoogleAdsCustomer>();
 
 // Initialize with sample data
-campaigns.set('9876543210', sampleCampaign);
+campaigns.set(sampleCampaign.id!, sampleCampaign); // Use the actual ID from sampleCampaign
 adGroups.set('1111111111', sampleAdGroup);
 adGroupAds.set('1111111111~2222222222', sampleAdGroupAd);
 customers.set(sampleCustomer.id, sampleCustomer);

@@ -1,6 +1,16 @@
 import express, { Request, Response, NextFunction } from 'express';
-import { Database } from '../db/database';
-import { seedAll } from '../db/seeders/seedAll';
+import path from 'path';
+
+// Dynamic imports for database modules to avoid loading faker in tests
+// These will be imported when needed in the route handlers
+// import { Database } from '../db/database';
+// import { seedAll } from '../db/seeders/seedAll';
+// import { seedMeta } from '../db/seeders/seedMeta';
+// import { seedGoogleAds } from '../db/seeders/seedGoogleAds';
+// import { seedLinkedIn } from '../db/seeders/seedLinkedIn';
+// import { seedTikTok } from '../db/seeders/seedTikTok';
+// import { seedTradeDesk } from '../db/seeders/seedTradeDesk';
+// import { seedDV360 } from '../db/seeders/seedDV360';
 
 const router = express.Router();
 
@@ -45,6 +55,15 @@ const adminAuth = (req: Request, res: Response, next: NextFunction): void => {
 };
 
 /**
+ * GET /admin/ui
+ * Serve the admin UI (no auth required for easy access)
+ */
+router.get('/ui', (_req: Request, res: Response) => {
+  const uiPath = path.join(__dirname, '..', 'admin', 'ui.html');
+  res.sendFile(uiPath);
+});
+
+/**
  * GET /admin/health
  * Database health check
  */
@@ -52,6 +71,7 @@ router.get('/health', adminAuth, async (_req: Request, res: Response) => {
   console.log('📊 Admin: Database health check requested');
 
   try {
+    const { Database } = await import('../db/database');
     const healthy = await Database.healthCheck();
     const stats = await Database.getStats();
 
@@ -79,25 +99,21 @@ router.get('/health', adminAuth, async (_req: Request, res: Response) => {
 
 /**
  * GET /admin/stats
- * Get database statistics
+ * Get database statistics (no auth for UI access)
  */
-router.get('/stats', adminAuth, async (_req: Request, res: Response) => {
+router.get('/stats', async (_req: Request, res: Response) => {
   console.log('📊 Admin: Database stats requested');
 
   try {
+    const { Database } = await import('../db/database');
     const stats = await Database.getStats();
 
-    // Add additional platform breakdown if available
+    // Return simple format for UI compatibility
     const response = {
-      overview: stats,
-      platforms: {
-        meta: 'Statistics per platform coming in Phase 2',
-        google_ads: 'Statistics per platform coming in Phase 2',
-        linkedin: 'Statistics per platform coming in Phase 2',
-        tiktok: 'Statistics per platform coming in Phase 2',
-        tradedesk: 'Statistics per platform coming in Phase 2',
-        dv360: 'Statistics per platform coming in Phase 2'
-      },
+      campaigns: stats.campaigns,
+      adGroups: stats.adGroups,
+      ads: stats.ads,
+      metrics: stats.metrics,
       timestamp: new Date().toISOString()
     };
 
@@ -121,6 +137,9 @@ router.post('/reset', adminAuth, async (_req: Request, res: Response) => {
   console.log('🗑️  Admin: Database reset and reseed requested');
 
   try {
+    const { Database } = await import('../db/database');
+    const { seedAll } = await import('../db/seeders/seedAll');
+
     const startTime = Date.now();
 
     // Reset database
@@ -157,49 +176,120 @@ router.post('/reset', adminAuth, async (_req: Request, res: Response) => {
 
 /**
  * POST /admin/seed
- * Seed database if empty
+ * Seed specific platforms (no auth for UI access)
+ * Body: { platforms: string[], counts: { [platform]: number } }
  */
-router.post('/seed', adminAuth, async (_req: Request, res: Response) => {
-  console.log('🌱 Admin: Database seed requested');
+router.post('/seed', async (req: Request, res: Response) => {
+  console.log('🌱 Admin: Platform seed requested');
 
   try {
-    const isEmpty = await Database.isEmpty();
+    const { platforms } = req.body;
+    // TODO: Use counts parameter to customize campaign counts per platform
+    // const { counts } = req.body;
 
-    if (!isEmpty) {
-      const stats = await Database.getStats();
-      console.log('ℹ️  Database already contains data, skipping seed');
-
-      return res.json({
-        message: 'Database already contains data, skipping seed',
-        stats,
+    if (!platforms || !Array.isArray(platforms) || platforms.length === 0) {
+      return res.status(400).json({
+        error: 'Invalid request',
+        message: 'Please provide platforms array',
         timestamp: new Date().toISOString()
       });
     }
 
-    const startTime = Date.now();
+    // Dynamic imports
+    const { Database } = await import('../db/database');
+    const { seedMeta } = await import('../db/seeders/seedMeta');
+    const { seedGoogleAds } = await import('../db/seeders/seedGoogleAds');
+    const { seedLinkedIn } = await import('../db/seeders/seedLinkedIn');
+    const { seedTikTok } = await import('../db/seeders/seedTikTok');
+    const { seedTradeDesk } = await import('../db/seeders/seedTradeDesk');
+    const { seedDV360 } = await import('../db/seeders/seedDV360');
 
-    // Seed database
-    console.log('🌱 Seeding empty database...');
-    await seedAll();
+    const startTime = Date.now();
+    const results: any = {};
+
+    // Platform seeder mapping
+    const seeders: Record<string, Function> = {
+      meta: seedMeta,
+      google_ads: seedGoogleAds,
+      linkedin: seedLinkedIn,
+      tiktok: seedTikTok,
+      tradedesk: seedTradeDesk,
+      dv360: seedDV360
+    };
+
+    // Seed each platform sequentially
+    for (const platform of platforms) {
+      if (!seeders[platform]) {
+        console.log(`⚠️  Unknown platform: ${platform}, skipping`);
+        results[platform] = { error: 'Unknown platform' };
+        continue;
+      }
+
+      console.log(`🌱 Seeding ${platform}...`);
+
+      try {
+        const result = await seeders[platform]();
+        results[platform] = result;
+        console.log(`✅ ${platform}: ${result.campaigns} campaigns seeded`);
+      } catch (error: any) {
+        console.error(`❌ ${platform} seed failed:`, error.message);
+        results[platform] = { error: error.message };
+      }
+
+      // Small delay between platforms
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
 
     const duration = Date.now() - startTime;
     const stats = await Database.getStats();
 
     const response = {
-      message: 'Database seeded successfully',
+      message: 'Seeding completed',
+      results,
       stats,
       duration: `${duration}ms`,
       timestamp: new Date().toISOString()
     };
 
-    console.log(`✅ Database seeded in ${duration}ms`);
-    console.log(`   📊 Stats: ${stats.campaigns} campaigns, ${stats.adGroups} ad groups, ${stats.ads} ads`);
-
+    console.log(`✅ Seeding completed in ${duration}ms`);
     res.json(response);
   } catch (error: any) {
     console.error('❌ Seed error:', error);
     res.status(500).json({
       error: 'Database seeding failed',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+/**
+ * POST /admin/clear
+ * Clear all database tables (no auth for UI access)
+ */
+router.post('/clear', async (_req: Request, res: Response) => {
+  console.log('🗑️  Admin: Database clear requested');
+
+  try {
+    const { Database } = await import('../db/database');
+
+    console.log('📊 Clearing database...');
+    await Database.reset();
+
+    const stats = await Database.getStats();
+
+    const response = {
+      message: 'Database cleared successfully',
+      stats,
+      timestamp: new Date().toISOString()
+    };
+
+    console.log(`✅ Database cleared`);
+    res.json(response);
+  } catch (error: any) {
+    console.error('❌ Clear error:', error);
+    res.status(500).json({
+      error: 'Database clear failed',
       message: error.message,
       timestamp: new Date().toISOString()
     });

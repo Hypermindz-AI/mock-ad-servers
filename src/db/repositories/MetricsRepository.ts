@@ -1,5 +1,5 @@
 import { sql } from '@vercel/postgres';
-import { GeneratedMetric } from '../generators/MetricsGenerator';
+import { GeneratedMetric } from "../generators/metricsGenerator";
 
 export class MetricsRepository {
   /**

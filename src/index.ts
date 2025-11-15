@@ -23,12 +23,62 @@ import tikTokRouter from './platforms/tiktok/routes.js';
 import tradeDeskRouter from './platforms/tradedesk/routes.js';
 import dv360Router from './platforms/dv360/routes.js';
 
+// Import admin routes
+import adminRouter from './routes/admin.js';
+
+// Database imports will be done dynamically to avoid loading faker in tests
+// import { Database } from './db/database';
+// import { seedAll } from './db/seeders/seedAll';
+
 // Load environment variables
 dotenv.config();
 
 // Initialize Express app
 const app: Application = express();
 
+// ============================================
+// Database Initialization (Async)
+// ============================================
+
+/**
+ * Initialize database on cold start
+ * Only runs if DATABASE_URL is configured
+ */
+(async () => {
+  try {
+    // Check if Postgres is configured (support both DATABASE_URL and POSTGRES_URL for backwards compatibility)
+    const databaseUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+    if (databaseUrl) {
+      // Set POSTGRES_URL for @vercel/postgres SDK
+      process.env.POSTGRES_URL = databaseUrl;
+
+      console.log('🗄️  Initializing Postgres database...');
+
+      // Dynamic imports to avoid loading faker during test initialization
+      const { Database } = await import('./db/database');
+      const { seedAll } = await import('./db/seeders/seedAll');
+
+      await Database.initialize();
+
+      // Check if database is empty and seed if needed
+      const isEmpty = await Database.isEmpty();
+      if (isEmpty) {
+        console.log('📝 Database is empty, running initial seed...');
+        await seedAll();
+      }
+
+      const stats = await Database.getStats();
+      console.log('✅ Database ready');
+      console.log(`   📊 ${stats.campaigns} campaigns, ${stats.adGroups} ad groups, ${stats.ads} ads`);
+    } else {
+      console.log('⚠️  DATABASE_URL not configured, running in mock-only mode');
+      console.log('   Database features will be unavailable');
+    }
+  } catch (error) {
+    console.error('❌ Database initialization failed:', error);
+    console.error('   Application will continue in mock-only mode');
+  }
+})();
 // Security middleware
 // Configure helmet to allow Swagger UI to load from CDN
 app.use(helmet({
@@ -198,6 +248,9 @@ app.use('/ttd/v3', tradeDeskRouter);
 
 // DV360 API v4
 app.use('/dv360/v4', dv360Router);
+
+// Admin API
+app.use('/admin', adminRouter);
 
 // ============================================
 // Error Handling

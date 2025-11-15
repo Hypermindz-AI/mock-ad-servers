@@ -15,6 +15,8 @@ export interface GeneratedCampaign {
 }
 
 export class CampaignGenerator {
+  private static idCounter = 0;
+
   /**
    * Generate realistic campaign name
    */
@@ -76,34 +78,35 @@ export class CampaignGenerator {
   private static generateId(platform: string): string {
     const timestamp = Date.now();
     const random = faker.number.int({ min: 1000, max: 9999 });
+    const counter = ++this.idCounter;
 
     switch (platform) {
       case 'meta':
         // Meta campaigns start with 12021...
-        return `12021${timestamp.toString().slice(-10)}`;
+        return `12021${timestamp.toString().slice(-10)}${random}${counter}`;
 
       case 'google_ads':
         // Google Ads uses numeric IDs
-        return `${timestamp.toString().slice(-10)}`;
+        return `${timestamp.toString().slice(-10)}${random}${counter}`;
 
       case 'linkedin':
         // LinkedIn uses URN format
-        return `urn:li:sponsoredCampaign:${timestamp}${random}`;
+        return `urn:li:sponsoredCampaign:${timestamp}${random}${counter}`;
 
       case 'tiktok':
         // TikTok uses numeric IDs
-        return `${timestamp}${random}`;
+        return `${timestamp}${random}${counter}`;
 
       case 'tradedesk':
         // Trade Desk uses prefixed format
-        return `ttd_campaign_${timestamp}`;
+        return `ttd_campaign_${timestamp}${random}${counter}`;
 
       case 'dv360':
         // DV360 uses numeric IDs
-        return `${timestamp}${random}`;
+        return `${timestamp}${random}${counter}`;
 
       default:
-        return `${platform}_${timestamp}${random}`;
+        return `${platform}_${timestamp}${random}${counter}`;
     }
   }
 

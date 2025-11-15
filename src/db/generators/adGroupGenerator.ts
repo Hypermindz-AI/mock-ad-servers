@@ -14,6 +14,8 @@ export interface GeneratedAdGroup {
 }
 
 export class AdGroupGenerator {
+  private static idCounter = 0;
+
   /**
    * Generate realistic ad group name
    */
@@ -72,34 +74,35 @@ export class AdGroupGenerator {
   private static generateId(platform: string, _campaignId: string): string {
     const timestamp = Date.now();
     const random = faker.number.int({ min: 1000, max: 9999 });
+    const counter = ++this.idCounter;
 
     switch (platform) {
       case 'meta':
         // Meta ad sets start with 23847...
-        return `23847${timestamp.toString().slice(-10)}`;
+        return `23847${timestamp.toString().slice(-10)}${random}${counter}`;
 
       case 'google_ads':
         // Google Ads uses numeric IDs
-        return `${timestamp.toString().slice(-10)}${random}`;
+        return `${timestamp.toString().slice(-10)}${random}${counter}`;
 
       case 'linkedin':
         // LinkedIn uses URN format
-        return `urn:li:sponsoredCampaignGroup:${timestamp}${random}`;
+        return `urn:li:sponsoredCampaignGroup:${timestamp}${random}${counter}`;
 
       case 'tiktok':
         // TikTok uses numeric IDs
-        return `${timestamp}${random}`;
+        return `${timestamp}${random}${counter}`;
 
       case 'tradedesk':
         // Trade Desk uses prefixed format
-        return `ttd_adgroup_${timestamp}`;
+        return `ttd_adgroup_${timestamp}${random}${counter}`;
 
       case 'dv360':
         // DV360 uses numeric IDs (insertion order)
-        return `${timestamp}${random}`;
+        return `${timestamp}${random}${counter}`;
 
       default:
-        return `${platform}_ag_${timestamp}${random}`;
+        return `${platform}_ag_${timestamp}${random}${counter}`;
     }
   }
 
